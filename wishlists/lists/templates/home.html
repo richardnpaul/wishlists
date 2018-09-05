@@ -1,8 +1,17 @@
 {% extends 'base.html' %}
 
 {% block body %}
-        <div id="register_or_login">
-            <p>Please register or login to create, modify or interact with wish lists.</p>
-            <a href="/">Register</a>
+        <div>
+            <form method="post">
+                <label>Enter a wishlist item here</label>
+                <input name="item_text" placeholder="Enter a wishlist item here" />
+                {% csrf_token %}
+            </form>
+
+            <table>
+                {% for item in items %}
+                <tr><td>{{ item.text }}</td></tr>
+                {% endfor %}
+            </table>
         </div>
 {% endblock %}
