@@ -93,7 +93,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         # generates a unique url on post submission which can be visited to see
         # the list
         v1_url = self.browser.current_url
-        self.assertRegex(v1_url, '/wishlists/\d+/')
+        self.assertRegex(v1_url, '/wishlists/.+/')
 
         # Shut down browser and start a new session to clear out v1's stuff
         self.browser.quit()
@@ -111,7 +111,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.wait_for_row_in_list_table("v2's first item")
         v2_url = self.browser.current_url
 
-        self.assertRegex(v2_url, '/wishlists/\d+/')
+        self.assertRegex(v2_url, '/wishlists/.+/')
         self.assertNotEqual(v1_url, v2_url)
 
         new_page_text = self.browser.find_element_by_tag_name('body').text

@@ -23,7 +23,7 @@ class HomePageTest(TestCase):
         response = self.client.post('/',
                                     data={'item_text': 'Christmas wish no.1'})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/wishlists/just-the-one-list/')
 
     def test_home_page_displays_all_created_items(self):
         item1 = Item.objects.create(text='Christmas wish no.1')
