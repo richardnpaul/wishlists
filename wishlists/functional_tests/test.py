@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException
 
-MAX_WAIT = 5
+MAX_WAIT = 10
 
 
 def wait(fn):
@@ -72,8 +72,47 @@ class FunctionalTest(StaticLiveServerTestCase):
         )
         self.wait_for_row_in_list_table('Christmas wish no.1')
 
+        inputbox = self.get_item_input_box()
         # So the visitor adds another item
         inputbox.send_keys('Christmas wish no.2')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('Christmas wish no.1')
         self.wait_for_row_in_list_table('Christmas wish no.2')
+
+    def test_multiple_lists(self):
+        # Visitor starts a new list
+        self.browser.get(self.live_server_url)
+
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys('First list item')
+        inputbox.send_keys(Keys.ENTER)
+
+        self.wait_for_row_in_list_table('First list item')
+
+        # The visitor wonders if the site saves multiple lists, the site
+        # generates a unique url on post submission which can be visited to see
+        # the list
+        v1_url = self.browser.current_url
+        self.assertRegex(v1_url, '/wishlists/\d+/')
+
+        # Shut down browser and start a new session to clear out v1's stuff
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # A new visitor comes along and starts a list
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('First list item', page_text)
+
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys("v2's first item")
+        inputbox.send_keys(Keys.ENTER)
+
+        self.wait_for_row_in_list_table("v2's first item")
+        v2_url = self.browser.current_url
+
+        self.assertRegex(v2_url, '/wishlists/\d+/')
+        self.assertNotEqual(v1_url, v2_url)
+
+        new_page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('First list item', new_page_text)
