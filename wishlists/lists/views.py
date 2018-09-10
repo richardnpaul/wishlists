@@ -2,13 +2,25 @@
 from django.shortcuts import render, redirect
 
 # Local
-from .models import Item
+from .models import Item, Wishlist
 
 
 def home_page(request):
-    if request.method == 'POST':
-        Item.objects.create(text=request.POST['item_text'])
-        return redirect('/')
-    item_list = Item.objects.all()
-    return render(request, 'home.html', {'items': item_list})
+    return render(request, 'home.html')
 
+
+def view_list(request, wishlist_id):
+    wishlist = Wishlist.objects.get(id=wishlist_id)
+    return render(request, 'wishlist.html', {'wishlist': wishlist})
+
+
+def new_list(request):
+    wishlist = Wishlist.objects.create()
+    Item.objects.create(text=request.POST['item_text'], wishlist=wishlist)
+    return redirect(f'/wishlists/{wishlist.id}/')
+
+
+def add_item(request, wishlist_id):
+    wishlist = Wishlist.objects.get(id=wishlist_id)
+    Item.objects.create(text=request.POST['item_text'], wishlist=wishlist)
+    return redirect(f'/wishlists/{wishlist.id}/')

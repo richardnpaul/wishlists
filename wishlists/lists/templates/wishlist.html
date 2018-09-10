@@ -2,10 +2,16 @@
 
 {% block body %}
         <div>
-            <form method="post" action="/wishlists/new/">
+            <form method="post" action="/wishlists/{{ wishlist.id }}/add_item/">
                 <label>Enter a wishlist item here</label>
                 <input name="item_text" placeholder="Enter a wishlist item here" />
                 {% csrf_token %}
             </form>
+
+            <table>
+                {% for item in wishlist.item_set.all %}
+                <tr><td>{{ item.text }}</td></tr>
+                {% endfor %}
+            </table>
         </div>
 {% endblock %}
