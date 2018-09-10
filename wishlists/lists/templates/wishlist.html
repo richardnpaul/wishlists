@@ -2,7 +2,7 @@
 
 {% block body %}
         <div>
-            <form method="post" action="/wishlists/{{ wishlist.id }}/add_item/">
+            <form method="post" action="/wishlists/{{ wishlist.uuid }}/add_item/">
                 <label>Enter a wishlist item here</label>
                 <input name="item_text" placeholder="Enter a wishlist item here" />
                 {% csrf_token %}

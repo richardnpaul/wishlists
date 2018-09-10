@@ -1,9 +1,13 @@
+# System
+import uuid
+
 # Django
 from django.db import models
 
 
 class Wishlist(models.Model):
-    pass
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False,
+                            db_index=True, max_length=32)
 
 
 class Item(models.Model):
