@@ -1,11 +1,5 @@
 {% extends 'base.html' %}
 
-{% block body %}
-        <div>
-            <form method="post" action="/wishlists/new/">
-                <label>Enter a wishlist item here</label>
-                <input name="item_text" placeholder="Enter a wishlist item here" />
-                {% csrf_token %}
-            </form>
-        </div>
-{% endblock %}
+{% block header_text %}Start a new wishlist{% endblock %}
+
+{% block form_action %}{% url 'new_list' %}{% endblock %}

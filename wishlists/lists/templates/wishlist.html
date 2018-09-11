@@ -1,17 +1,13 @@
 {% extends 'base.html' %}
 
-{% block body %}
-        <div>
-            <form method="post" action="/wishlists/{{ wishlist.uuid }}/add_item/">
-                <label>Enter a wishlist item here</label>
-                <input name="item_text" placeholder="Enter a wishlist item here" />
-                {% csrf_token %}
-            </form>
+{% block header_text %}Your wishlist list{% endblock %}
 
-            <table>
-                {% for item in wishlist.item_set.all %}
-                <tr><td>{{ item.text }}</td></tr>
-                {% endfor %}
-            </table>
-        </div>
+{% block form_action %}{% url 'view_list' wishlist.uuid %}{% endblock %}
+
+{% block table %}
+                    <table class="table">
+                        {% for item in wishlist.item_set.all %}
+                        <tr><td>{{ item.text }}</td></tr>
+                        {% endfor %}
+                    </table>
 {% endblock %}
