@@ -1,13 +1,26 @@
 {% extends 'base.html' %}
 
-{% block header_text %}Your wishlist list{% endblock %}
+{% block header_text %}Your wishlist{% endblock %}
 
 {% block form_action %}{% url 'view_list' wishlist.uuid %}{% endblock %}
 
 {% block table %}
-                    <table class="table">
-                        {% for item in wishlist.item_set.all %}
-                        <tr><td>{{ item.text }}</td></tr>
-                        {% endfor %}
+                    <table class="table table-hover">
+                        <thead class="thead-light">
+                            <tr class="d-flex">
+                                <th class="col-2" scope="col">Number of Desired Items</th>
+                                <th class="col-7" scope="col">Desired Items</th>
+                                <th class="col-1" scope="col">Price of Item</th>
+                                <th class="col-2" scope="col">Priority of Item</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in wishlist.item_set.all %}<tr class="d-flex">
+                                <td class="col-2" scope="row">{{ item.number }}</td>
+                                <td class="col-7" >{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                <td class="col-1" >{% if item.price %}{{ item.price }}{% endif %}</td>
+                                <td class="col-2" >{{ item.priority }}</td>
+                            </tr>{% endfor %}
+                        </tbody>
                     </table>
 {% endblock %}
