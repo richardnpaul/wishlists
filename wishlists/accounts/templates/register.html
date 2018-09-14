@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block login_button %}{% endblock %}
+
+{% block header_text %}Please register below{% endblock %}
+
+{% block form %}
+                        <form action="{% url 'account_registration' %}" method="post">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                {{ form.username }}
+                                {% if form.username.help_text %}
+                                <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                                {% endif %}
+                                {% if form.username.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.username.errors }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form.password1 }}
+                                {% if form.password1.help_text %}
+                                <small class="form-text text-muted">{{ form.password1.help_text }}</small>
+                                {% endif %}
+                                {% if form.password1.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.password1.errors }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form.password2 }}
+                                {% if form.password2.help_text %}
+                                <small class="form-text text-muted">{{ form.password2.help_text }}</small>
+                                {% endif %}
+                                {% if form.password2.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.password2.errors }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Register</button>
+                        </form>
+{% endblock %}

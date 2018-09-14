@@ -31,12 +31,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Local
     'functional_tests',
     'lists',
     'accounts',
@@ -125,3 +127,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Outbound email settings
+
+# Console email backend for dev
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# Gmail accounts require additional configuration to allow direct mail through
+
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_HOST_USER = 'youremail'
+#EMAIL_HOST_PASSWORD = 'youremailpassword'
+#EMAIL_PORT = 587

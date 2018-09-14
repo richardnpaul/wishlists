@@ -11,12 +11,19 @@
 
     </head>
     <body>
+        {% if messages %}<div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>{% endif %}
         <div class="container">
             <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <a class="navbar-brand" href="#">Wishlists</a>
+                {% block login_button %}
                 {% if not user.is_authenticated %}
                 <div class="nav-item dropdown w-25">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
@@ -44,8 +51,9 @@
                     </div>
                 </div>
                 {% elif user.is_authenticated %}
-                <div class="nav-item"><a href="#">Logout</a></div>
+                <div class="nav-item"><a href="{% url 'account_logout' %}">Logout</a></div>
                 {% endif %}
+                {% endblock %}
             </nav>
 
             <div class="row">
