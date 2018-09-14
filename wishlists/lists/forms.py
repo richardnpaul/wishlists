@@ -7,13 +7,13 @@ from .models import Item
 EMPTY_ITEM_ERROR = "You can't have an empty wishlist item"
 
 
-class ItemForm(forms.models.ModelForm):
+class ItemForm(forms.ModelForm):
 
     class Meta:
         model = Item
         fields = ('text',)
         widgets = {
-            'text': forms.fields.TextInput(
+            'text': forms.TextInput(
                 attrs={
                     'placeholder': 'Enter a wishlist item here',
                     'class': 'form-control input-lg',

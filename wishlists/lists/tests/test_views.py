@@ -106,4 +106,3 @@ class ListViewTest(TestCase):
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'New item for existing wishlist')
         self.assertEqual(new_item.wishlist, correct_wishlist)
-

@@ -4,10 +4,14 @@ from django.shortcuts import render, redirect
 # Local
 from .models import Wishlist
 from .forms import ItemForm
+from accounts.forms import LoginForm
 
 
 def home_page(request):
-    return render(request, 'home.html', {'form': ItemForm()})
+    return render(request, 'home.html', {
+        'form': ItemForm(),
+        'login_form': LoginForm()
+    })
 
 
 def new_list(request):
@@ -29,4 +33,5 @@ def view_list(request, wishlist_uuid):
             form.save(for_list=wishlist)
             return redirect(wishlist)
     return render(request, 'wishlist.html',
-                  {'wishlist': wishlist, 'form': form})
+                  {'wishlist': wishlist, 'form': form,
+                   'login_form': LoginForm()})

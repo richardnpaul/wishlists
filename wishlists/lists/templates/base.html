@@ -12,20 +12,48 @@
     </head>
     <body>
         <div class="container">
+            <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" href="#">Wishlists</a>
+                {% if not user.is_authenticated %}
+                <div class="nav-item dropdown w-25">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
+                    <div class="dropdown-menu">
+                        <form class="dropdown-item" action="{% url 'account_login' %}?next={{ request.path|urlencode }}" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="{{ login_form.email.label }}">Email address</label>
+                                {{ login_form.email }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ login_form.password.label }}">Password</label>
+                                {{ login_form.password }}
+                            </div>
+                            <div class="form-check py-1">
+                                <input name="remember_me" type="checkbox" class="form-check-input" id="dropdownCheck">
+                                <label class="form-check-label" for="dropdownCheck">Remember me</label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <button type="submit" class="btn btn-primary">Sign in</button>
+                        </form>
+                        <!-- <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Click here to register</a>
+                        <a class="dropdown-item" href="#">Click here to reset password</a> -->
+                    </div>
+                </div>
+                {% elif user.is_authenticated %}
+                <div class="nav-item"><a href="#">Logout</a></div>
+                {% endif %}
+            </nav>
 
             <div class="row">
                 <div class="col-md-6 offset-3 jumbotron">
                     <div class="text-center">
                         <h1>{% block header_text %}{% endblock %}</h1>
-                        <form method="POST" action="{% block form_action %}{% endblock %}">
-                            {{ form.text }}
-                            {% csrf_token %}
-                            {% if form.errors %}
-                            <div class="form-group has-error">
-                                <div class="form-text">{{ form.text.errors }}</div>
-                            </div>
-                            {% endif %}
-                        </form>
+                        {% block form %}
+                        {% endblock %}
                     </div>
                 </div>
             </div>

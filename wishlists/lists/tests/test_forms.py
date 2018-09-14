@@ -1,6 +1,7 @@
 # Django
 from django.test import TestCase
 
+# Local
 from ..forms import ItemForm, EMPTY_ITEM_ERROR
 from ..models import Wishlist, Item
 
