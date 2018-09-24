@@ -32,7 +32,8 @@ def account_login(request):
 
             if user is not None:
                 if user.is_active:
-                    login(request, user)
+                    login(request, user,
+                          backend='django.contrib.auth.backends.ModelBackend')
                     return HttpResponseRedirect(next_url)
     else:
         login_form = LoginForm()
@@ -80,7 +81,8 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        login(request, user)
+        login(request, user,
+              backend='django.contrib.auth.backends.ModelBackend')
         return redirect('home_page')
     else:
         return render(request, 'account_activation_invalid.html')

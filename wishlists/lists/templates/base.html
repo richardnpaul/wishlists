@@ -19,41 +19,68 @@
         </div>{% endif %}
         <div class="container">
             <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#">Wishlists</a>
+                <div class="collapse navbar-collapse justify-content-end">
+                    {% block login_button %}
+                    {% if not user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
+                        <div class="dropdown-menu dropdown-menu-right" style="min-width:14.5rem;">
+                            <form class="dropdown-item" action="{% url 'account_login' %}?next={{ request.path|urlencode }}" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="{{ login_form.email.label }}">Email address</label>
+                                    {{ login_form.email }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ login_form.password.label }}">Password</label>
+                                    {{ login_form.password }}
+                                </div>
+                                <div class="form-check py-1">
+                                    <input name="remember_me" type="checkbox" class="form-check-input" id="dropdownCheck">
+                                    <label class="form-check-label" for="dropdownCheck">Remember me</label>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <button type="submit" class="m-0 col-12 form-row btn btn-primary text-center">Sign in</button>
+                            </form>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center col-12" href="{% url 'account_registration' %}">Click here to register</a>
+                            <!--<a class="dropdown-item" href="#">Click here to reset password</a> -->
+                            <div class="dropdown-divider"></div>
+                            <p class="w-100 text-center col-12">Or login with one of the providers below</p>
+                            <div class="social">
+                                <ul class="list-inline text-center">
+
+
+                                    <li class="google list-inline-item w-25 h-25">
+                                        <a href="{% url 'social:begin' 'google' %}">
+                                            <img class="w-100 h-100" src="https://developers.google.com/identity/images/g-logo.png" alt="Sign in with Google" />
+                                        </a>
+                                    </li>
+                                    <li class="facebook list-inline-item w-25 h-25">
+                                        <a href="{% url 'social:begin' 'facebook' %}">
+                                            <img class="w-100 h-100" src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Sign in with Facebook" />
+                                        </a>
+                                    </li>
+
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif user.is_authenticated %}
+                    <div class="nav-item">
+                        <a class="nav-link disabled">{{ user.username }}</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link active" href="{% url 'account_logout' %}">Logout</a>
+                    </div>
+                    {% endif %}
+                    {% endblock %}
+                </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <a class="navbar-brand" href="#">Wishlists</a>
-                {% block login_button %}
-                {% if not user.is_authenticated %}
-                <div class="nav-item dropdown w-25">
-                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
-                    <div class="dropdown-menu">
-                        <form class="dropdown-item" action="{% url 'account_login' %}?next={{ request.path|urlencode }}" method="post">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="{{ login_form.email.label }}">Email address</label>
-                                {{ login_form.email }}
-                            </div>
-                            <div class="form-group">
-                                <label for="{{ login_form.password.label }}">Password</label>
-                                {{ login_form.password }}
-                            </div>
-                            <div class="form-check py-1">
-                                <input name="remember_me" type="checkbox" class="form-check-input" id="dropdownCheck">
-                                <label class="form-check-label" for="dropdownCheck">Remember me</label>
-                            </div>
-                            <div class="dropdown-divider"></div>
-                            <button type="submit" class="btn btn-primary">Sign in</button>
-                        </form>
-                        <!-- <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Click here to register</a>
-                        <a class="dropdown-item" href="#">Click here to reset password</a> -->
-                    </div>
-                </div>
-                {% elif user.is_authenticated %}
-                <div class="nav-item"><a href="{% url 'account_logout' %}">Logout</a></div>
-                {% endif %}
-                {% endblock %}
             </nav>
 
             <div class="row">

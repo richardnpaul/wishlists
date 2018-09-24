@@ -6,22 +6,51 @@
 
 {% block form %}
                         <form action="{% url 'account_login' %}" method="post">
-                            {% csrf_token %}
                             <div class="form-group">
-                                {{ login_form.email }}
-                            </div>
-                            <div class="form-group">
-                                {{ login_form.password }}
-                            </div>
-                            <div class="form-row">
-                                <div class="col">
-                                    <div class="form-check py-2">
-                                        <input name="remember_me" type="checkbox" class="form-check-input" id="remember_me"/>
-                                        <label class="form-check-label" for="remember_me">Remember me</label>
+                                {% csrf_token %}
+                                <div class="form-row m-2">
+                                    {{ login_form.email }}
+                                </div>
+                                <div class="form-row m-2">
+                                    {{ login_form.password }}
+                                </div>
+                                <div class="form-group row">
+                                    <div class="form-group col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="autoSizingCheck">
+                                            <label class="form-check-label" for="autoSizingCheck">Remember me</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-3 offset-5">
+                                        <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </div>
-                                <div class="col">
-                                    <button type="submit" class="btn btn-primary mb-2">Sign in</button>
+                                <div class="form-group row">
+                                    <div class="col align-items-center">
+                                        <strong><a class="text-center" href="{% url 'account_registration' %}">Click here to register</a></strong>
+                                        <!--<a class="dropdown-item" href="#">Click here to reset password</a> -->
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <p class="w-100 text-center col-12">Or login with one of the providers below</p>
+                                    <div class="social col align-items-center">
+                                        <ul class="list-inline">
+
+
+                                            <li class="google list-inline-item w-25 h-25">
+                                                <a href="{% url 'social:begin' 'google' %}">
+                                                    <img class="w-100 h-100" src="https://developers.google.com/identity/images/g-logo.png" alt="Sign in with Google" />
+                                                </a>
+                                            </li>
+                                            <li class="facebook list-inline-item w-25 h-25">
+                                                <a href="{% url 'social:begin' 'facebook' %}">
+                                                    <img class="w-100 h-100" src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Sign in with Facebook" />
+                                                </a>
+                                            </li>
+
+
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </form>
