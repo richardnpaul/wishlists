@@ -1,15 +1,13 @@
-{% extends 'base.html' %}
+{% extends 'base.form.html' %}
 
 {% block header_text %}Your wishlist list{% endblock %}
 
+{% block form_action %}{% url 'edit_list' wishlist.uuid %}{% endblock %}
+
 {% block table %}
-                    {% if user.is_authenticated and user == wishlist.owner %}
-                    <a class="btn btn-primary float-right " role="button" href="{% url 'edit_list' wishlist.uuid %}">Edit</a>
-                    {% endif %}
                     <table class="table">
                         {% for item in wishlist.item_set.all %}
                         <tr><td>{{ item.text }}</td></tr>
                         {% endfor %}
                     </table>
-
 {% endblock %}
