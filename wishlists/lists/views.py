@@ -10,7 +10,6 @@ from accounts.forms import LoginForm
 
 def home_page(request):
     return render(request, 'home.html', {
-        'form': ItemForm(),
         'login_form': LoginForm()
     })
 

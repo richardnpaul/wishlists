@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-                        {% block form %}
+                        {% block main %}
                         <form method="POST" action="{% block form_action %}{% endblock %}">
                             {{ form.text }}
                             {% csrf_token %}

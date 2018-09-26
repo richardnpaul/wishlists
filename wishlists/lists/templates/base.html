@@ -19,7 +19,7 @@
         </div>{% endif %}
         <div class="container">
             <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand" href="#">Wishlists</a>
+                <a class="navbar-brand" href="/">Wishlists</a>
                 <div class="collapse navbar-collapse justify-content-end">
                     {% block login_button %}
                     {% if not user.is_authenticated %}
@@ -87,7 +87,7 @@
                 <div class="col-md-6 offset-3 jumbotron">
                     <div class="text-center">
                         <h1>{% block header_text %}{% endblock %}</h1>
-                        {% block form %}
+                        {% block main %}
                         {% endblock %}
                     </div>
                 </div>
