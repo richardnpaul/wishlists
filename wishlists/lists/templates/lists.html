@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block header_text %}My wishlists{% endblock %}
+
+{% block main %}
+
+                    <table class="table">
+                        {% for wishlist in lists %}
+                        <tr>
+                            <td><a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.title }}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+
+{% endblock %}
