@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block header_text %}Your item purchases{% endblock %}
+
+{% block main %}
+                <table class="table">
+                    {% for item in items %}
+                    <tr>
+                        <td><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">{{ item.text }}</a></td>
+                        <td><a href="{% url 'edit_list' item.wishlist_set.first.uuid %}" class="btn btn-primary float-right " role="button" >{{ item.wishlist_set.first.title }}</td>
+                        <td>{{ item.wishlist_set.owner_set.first_name }} {{ item.wishlist_set.owner_set.last_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+{% endblock %}

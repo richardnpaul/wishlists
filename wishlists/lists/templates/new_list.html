@@ -14,15 +14,18 @@
 
 {% block main %}
                         {% if user.is_authenticated %}
+                        <hr />
                         <form method="POST" action="{% url 'new_list' %}">
-                            {{ item_form.text }}
+                            <p class="form-text">Start a new wishlist</p>
+                            {{ wishlist_form.title }}
                             {% csrf_token %}
-                            {% if item_form.errors %}
+                            {% if wishlist_form.errors %}
                             <div class="form-group has-error">
-                                <div class="form-text">{{ item_form.text.errors }}</div>
+                                <div class="form-text">{{ wishlist_form.title.errors }}</div>
                             </div>
                             {% endif %}
                         </form>
+                        <hr />
                         <table class="table">
                             {% for wishlist in user.wishlist_set.all %}
                             <tr>
@@ -31,8 +34,5 @@
                             </tr>
                             {% endfor %}
                         </table>
-                        {% else %}
-                        <p class="">Log in <a href="#">here</a> to create a new list</p>
                         {% endif %}
 {% endblock %}
-

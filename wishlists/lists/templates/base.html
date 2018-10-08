@@ -70,6 +70,12 @@
                     </div>
                     {% elif user.is_authenticated %}
                     <div class="nav-item">
+                        <a href="{% url 'view_users' %}" class="nav-link btn btn-primary mr-2">View Users</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'view_my_lists' %}" class="nav-link btn btn-primary">My Lists</a>
+                    </div>
+                    <div class="nav-item">
                         <a class="nav-link disabled">{{ user.username }}</a>
                     </div>
                     <div class="nav-item">

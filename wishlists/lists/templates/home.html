@@ -8,22 +8,31 @@
             Start a new wishlist
         {% endif %}
     {% elif not user.is_authenticated %}
-        Start a new wishlist
+        Register an account or login to create/modify wishlists
     {% endif %}
 {% endblock %}
 
 {% block main %}
                         {% if user.is_authenticated %}
+                        <form method="POST" action="{% url 'new_list' %}">
+                            {{ wishlist_form.title }}
+                            {% csrf_token %}
+                            {% if wishlist_form.errors %}
+                            <div class="form-group has-error">
+                                <div class="form-text">{{ wishlist_form.title.errors }}</div>
+                            </div>
+                            {% endif %}
+                        </form>
                         <table class="table">
                             {% for wishlist in user.wishlist_set.all %}
                             <tr>
-                                <td><a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.uuid }}</a></td>
+                                <td><a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.name }}</a></td>
                                 <td><a class="btn btn-primary float-right " role="button" href="{% url 'edit_list' wishlist.uuid %}">Edit</a></td>
                             </tr>
                             {% endfor %}
                         </table>
                         {% else %}
-                        <p class="">Log in to create a new list</p>
+                        <p class="">Log in <a href="#">here</a> to create a new list</p>
                         {% endif %}
 {% endblock %}
 

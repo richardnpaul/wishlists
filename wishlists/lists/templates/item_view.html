@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+                        {% block main %}
+                        <h2>
+                            {{ wishlist.owner.first_name }}'s wishlist:<br />
+                            <a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.title }}</a>
+                        </h2>
+                        <table class="table">
+                            <tr>
+                                {% if not user.is_authenticated or user == wishlist.owner %}
+                                <td>{{ item.text }}</td>
+                                {% else %}
+                                    {% if not item.gifter %}
+                                <td>
+                                    <form method="POST" action="{% url 'buy_list_item' item.uuid %}">
+                                        <div class="form-group row">
+                                            {% csrf_token %}
+                                            <label class="col-sm-10 col-form-label">{{ item.text }}</label>
+                                            <input class="col-sm-2 form-control btn-primary" type="submit" value="Buy" role="button" />
+                                        </div>
+                                    </form>
+                                </td>
+                                    {% elif item.gifter.id == user.id %}
+                                <td>
+                                    <form method="POST" action="{% url 'return_list_item' item.uuid %}">
+                                        <div class="form-group row">
+                                            {% csrf_token %}
+                                            <label class="col-sm-10 col-form-label">{{ item.text }}</label>
+                                            <input class="col-sm-2 form-control btn-danger" type="submit" value="Return" role="button" />
+                                        </div>
+                                    </form>
+                                </td>
+                                    {% endif %}
+                                {% endif %}
+                            </tr>
+                        </table>
+                        {% endblock %}

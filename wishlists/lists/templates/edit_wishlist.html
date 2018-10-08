@@ -1,13 +1,13 @@
 {% extends 'base.form.html' %}
 
-{% block header_text %}Your wishlist list{% endblock %}
+{% block header_text %}{{ wishlist.title }}{% endblock %}
 
 {% block form_action %}{% url 'edit_list' wishlist.uuid %}{% endblock %}
 
 {% block table %}
                     <table class="table">
                         {% for item in wishlist.item_set.all %}
-                        <tr><td>{{ item.text }}</td></tr>
+                        <tr><td><a href="{% url 'view_list_item' item.uuid %}">{{ item.text }}</a></td></tr>
                         {% endfor %}
                     </table>
 {% endblock %}
