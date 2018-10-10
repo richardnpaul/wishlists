@@ -6,15 +6,41 @@
                     {% if user.is_authenticated and user == wishlist.owner %}
                     <a class="btn btn-primary float-right " role="button" href="{% url 'edit_list' wishlist.uuid %}">Edit</a>
                     {% endif %}
-                    <table class="table">
-                        {% for item in wishlist.item_set.all %}
-                        <tr>
-                            <td>{{ item.text }}</td>
-                            {% if user.is_authenticated %}
-                            <td><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">View</a></td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </table>
+{% endblock %}
 
+{% block table %}
+                    <table class="table table-hover">
+                        <thead class="thead-light">
+                            <tr class="d-flex text-center">
+                                <th class="col-7" scope="col">Desired Item(s)</th>
+                                <th class="col-1" scope="col">Price</th>
+                                <th class="col-2" scope="col">Priority</th>
+                                <th class="col-2" scope="col">View Item</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        {% if not user.is_authenticated or user == wishlist.owner %}
+                            {% for item in wishlist.item_set.all %}
+                            <tr class="d-flex text-center">
+                                <td class="col-7">{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                <td class="col-1">{% if item.price %}{{ item.price }}{% endif %}</td>
+                                <td class="col-2">{{ item.priority }}</td>
+                                <td class="col-2"><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">View</a></td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            {% for item in wishlist.item_set.all %}
+                                {% if not item.gifter or item.gifter == user %}
+                            <tr class="d-flex text-center">
+                                <td class="col-7">{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                <td class="col-1">{% if item.price %}{{ item.price }}{% endif %}</td>
+                                <td class="col-2">{{ item.priority }}</td>
+                                <td class="col-2"><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">View</a></td>
+                            </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        </tbody>
+                    </table>
 {% endblock %}

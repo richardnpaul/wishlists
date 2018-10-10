@@ -3,11 +3,24 @@
 {% block header_text %}My wishlists{% endblock %}
 
 {% block main %}
+                        <form method="POST" action="{% url 'new_list' %}">
+                            {{ wishlist_form.title }}
+                            {% csrf_token %}
+                            {% if wishlist_form.errors %}
+                            <div class="form-group has-error">
+                                <div class="form-text">{{ wishlist_form.title.errors }}</div>
+                            </div>
+                            {% endif %}
+                        </form>
+{% endblock %}
+
+{% block table %}
 
                     <table class="table">
                         {% for wishlist in lists %}
                         <tr>
-                            <td><a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.title }}</a></td>
+                            <td>{{ wishlist.title }}</td>
+                            <td><a href="{% url 'view_list' wishlist.uuid %}" class="btn btn-primary float-right" role="button">View</a></td>
                         </tr>
                         {% endfor %}
                     </table>

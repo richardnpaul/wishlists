@@ -5,33 +5,47 @@
                             {{ wishlist.owner.first_name }}'s wishlist:<br />
                             <a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.title }}</a>
                         </h2>
-                        <table class="table">
-                            <tr>
+                        {% endblock %}
+
+                        {% block table %}
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr class="d-flex text-center">
+                                    <th class="col-auto col-md-8" scope="col">Desired Item</th>
+                                    <th class="col-auto col-md-1" scope="col">Price of Item</th>
+                                    {% if not user.is_authenticated or user == wishlist.owner %}
+                                    <th class="col-auto col-md-3" scope="col">Priority of Item</th>
+                                    {% else %}
+                                    <th class="col-auto col-md-2" scope="col">Priority of Item</th>
+                                    <th class="col-auto col-md-1" scope="col">Action</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="d-flex text-center">
+                                    <td class="col-auto col-md-8">{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                    <td class="col-auto col-md-1">{% if item.price %}{{ item.price }}{% endif %}</td>
                                 {% if not user.is_authenticated or user == wishlist.owner %}
-                                <td>{{ item.text }}</td>
+                                    <td class="col-auto col-md-3">{{ item.priority }}</td>
                                 {% else %}
+                                    <td class="col-auto col-md-2">{{ item.priority }}</td>
                                     {% if not item.gifter %}
-                                <td>
-                                    <form method="POST" action="{% url 'buy_list_item' item.uuid %}">
-                                        <div class="form-group row">
-                                            {% csrf_token %}
-                                            <label class="col-sm-10 col-form-label">{{ item.text }}</label>
-                                            <input class="col-sm-2 form-control btn-primary" type="submit" value="Buy" role="button" />
-                                        </div>
-                                    </form>
-                                </td>
+                                    <td class="col-auto col-md-1">
+                                        <form method="POST" action="{% url 'buy_list_item' item.uuid %}">
+                                                {% csrf_token %}
+                                                <input class="form-control btn btn-primary" type="submit" value="Buy" role="button" />
+                                        </form>
+                                    </td>
                                     {% elif item.gifter.id == user.id %}
-                                <td>
-                                    <form method="POST" action="{% url 'return_list_item' item.uuid %}">
-                                        <div class="form-group row">
-                                            {% csrf_token %}
-                                            <label class="col-sm-10 col-form-label">{{ item.text }}</label>
-                                            <input class="col-sm-2 form-control btn-danger" type="submit" value="Return" role="button" />
-                                        </div>
-                                    </form>
-                                </td>
+                                    <td  class="col-auto col-md-1">
+                                        <form method="POST" action="{% url 'return_list_item' item.uuid %}">
+                                                {% csrf_token %}
+                                                <input class="form-control btn btn-danger" type="submit" value="Return" role="button" />
+                                        </form>
+                                    </td>
                                     {% endif %}
                                 {% endif %}
-                            </tr>
+                                </tr>
+                            </tbody>
                         </table>
                         {% endblock %}

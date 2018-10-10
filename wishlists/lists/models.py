@@ -30,16 +30,31 @@ class Wishlist(models.Model):
 
 
 class Item(models.Model):
+    PRIORITY_CHOICES = (
+        ('1', 'Highest'),
+        ('2', 'High'),
+        ('3', 'Medium'),
+        ('4', 'Low'),
+        ('5', 'Lowest'),
+    )
+
     text = models.TextField()
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False,
                             db_index=True, max_length=32)
+    url = models.URLField(max_length=500, blank=True, default='')
+    price = models.DecimalField(null=True, blank=True, decimal_places=2,
+                                max_digits=16)
+    priority = models.CharField(default='medium', choices=PRIORITY_CHOICES,
+                                max_length=1)
+    # notes = models.TextField()
+    # date_added = models.DateTimeField()
     wishlist = models.ForeignKey(Wishlist, default=None,
                                  on_delete=models.CASCADE)
     gifter = models.ForeignKey(User, default=None, null=True,
                                on_delete=models.SET_DEFAULT)
 
     class Meta:
-        ordering = ('wishlist','id',)
+        ordering = ('priority','wishlist','id',)
         unique_together = ('text', 'wishlist',)
 
     def get_absolute_url(self):

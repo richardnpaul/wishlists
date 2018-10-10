@@ -29,6 +29,7 @@ def view_list(request, wishlist_uuid):
 def view_my_lists(request):
     lists = Wishlist.objects.filter(owner=request.user).all()
     return render(request, 'lists.html', {'lists': lists,
+                                          'wishlist_form': WishListForm(),
                                           'login_form': LoginForm()})
 
 

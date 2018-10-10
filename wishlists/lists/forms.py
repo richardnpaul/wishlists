@@ -32,19 +32,33 @@ class WishListForm(forms.ModelForm):
 
 class ItemForm(forms.ModelForm):
 
+    url = forms.URLField(max_length=500, required=False, widget=forms.URLInput(
+        attrs={
+            'placeholder': 'Enter a the website address to a wishlist item here',
+            'class': 'form-control',
+        }))
+    price = forms.DecimalField(required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-control'}))
+
     class Meta:
         model = Item
-        fields = ('text',)
+        fields = ('text', 'url', 'price', 'priority')
         widgets = {
             'text': forms.TextInput(
                 attrs={
                     'placeholder': 'Enter a wishlist item here',
-                    'class': 'form-control input-lg',
+                    'class': 'form-control',
                 }
             ),
+            'priority': forms.Select(
+                attrs={
+                    'class': 'form-check-input '
+                }
+            )
         }
         error_messages = {
-            'text': {'required': EMPTY_ITEM_ERROR}
+            'text': {'required': EMPTY_ITEM_ERROR},
+            'priority': {'required': 'A priority must be submitted. Defaults to medium'},
         }
 
     def save(self, for_list, as_user):
