@@ -4,5 +4,6 @@ Django==2.1.2
 pycparser==2.19
 pytz==2018.5
 six==1.11.0
+python-social-auth[django]==0.3.6
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0
