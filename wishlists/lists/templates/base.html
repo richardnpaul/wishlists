@@ -11,16 +11,16 @@
 
     </head>
     <body>
-        {% if messages %}<div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <!-- {% if messages %}<div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>{{ message }}</strong>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
-        </div>{% endif %}
+        </div>{% endif %} -->
         <div class="container">
             <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
                 <a class="navbar-brand" href="/">Wishlists</a>
-                <div class="collapse navbar-collapse justify-content-end">
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
                     {% block login_button %}
                     {% if not user.is_authenticated %}
                     <div class="nav-item dropdown">
