@@ -65,11 +65,12 @@ def view_list_item(request, item_uuid):
 def buy_list_item(request, item_uuid):
     item = Item.objects.get(uuid=item_uuid)
     wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
-    if not request.user == wishlist.owner:
+    if not item.gifter and not request.user == wishlist.owner:
         item.gifter = request.user
         item.save()
-    return redirect(item)
-
+        return redirect(item)
+    else:
+        return redirect(wishlist)
 
 @login_required
 @require_POST
