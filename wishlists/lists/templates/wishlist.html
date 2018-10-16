@@ -23,9 +23,9 @@
                         {% if not user.is_authenticated or user == wishlist.owner %}
                             {% for item in wishlist.item_set.all %}
                             <tr class="d-flex text-center">
-                                <td class="col-7">{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                <td class="col-7" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
                                 <td class="col-1">{% if item.price %}{{ item.price }}{% endif %}</td>
-                                <td class="col-2">{{ item.priority }}</td>
+                                <td class="col-2">{{ item.get_priority_display }}</td>
                                 <td class="col-2"><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">View</a></td>
                             </tr>
                             {% endfor %}
@@ -33,9 +33,9 @@
                             {% for item in wishlist.item_set.all %}
                                 {% if not item.gifter or item.gifter == user %}
                             <tr class="d-flex text-center">
-                                <td class="col-7">{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                <td class="col-7" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
                                 <td class="col-1">{% if item.price %}{{ item.price }}{% endif %}</td>
-                                <td class="col-2">{{ item.priority }}</td>
+                                <td class="col-2">{{ item.get_priority_display }}</td>
                                 <td class="col-2"><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">View</a></td>
                             </tr>
                                 {% endif %}

@@ -2,14 +2,30 @@
 
 {% block header_text %}Your item purchases{% endblock %}
 
-{% block main %}
-                <table class="table">
-                    {% for item in items %}
-                    <tr>
-                        <td><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">{{ item.text }}</a></td>
-                        <td><a href="{% url 'edit_list' item.wishlist_set.first.uuid %}" class="btn btn-primary float-right " role="button" >{{ item.wishlist_set.first.title }}</td>
-                        <td>{{ item.wishlist_set.owner_set.first_name }} {{ item.wishlist_set.owner_set.last_name }}</td>
-                    </tr>
-                    {% endfor %}
+{% block table %}
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr class="d-flex text-center">
+                            <th class="col-auto col-md-8" scope="col">Desired Item</th>
+                            <th class="col-auto col-md-1" scope="col">Price of Item</th>
+                            <th class="col-auto col-md-2" scope="col">Priority of Item</th>
+                            <th class="col-auto col-md-1" scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr class="d-flex text-center">
+                            <td class="col-auto col-md-8" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                            <td class="col-auto col-md-1">{% if item.price %}{{ item.price }}{% endif %}</td>
+                            <td class="col-auto col-md-2">{{ item.get_priority_display }}</td>
+                            <td  class="col-auto col-md-1">
+                                <form method="POST" action="{% url 'return_list_item' item.uuid %}">
+                                    {% csrf_token %}
+                                    <input class="form-control btn btn-danger" type="submit" value="Return" role="button" />
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
 {% endblock %}

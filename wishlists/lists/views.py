@@ -1,5 +1,5 @@
 # Django
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_safe
 from django.contrib.auth.models import User
@@ -58,6 +58,35 @@ def view_list_item(request, item_uuid):
     return render(request, 'item_view.html',
                   {'item': item, 'wishlist': wishlist,
                    'login_form': LoginForm()})
+
+
+@login_required
+def edit_list_item(request, item_uuid):
+    item = get_object_or_404(Item, uuid=item_uuid)
+    wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
+    item_form = ItemForm(instance=item)
+    if request.POST:
+        if item_form.is_valid():
+            item_form.save(request.POST)
+            return redirect(item)
+    return render(request, 'edit_item_view.html', {
+        'item': item, 'form': item_form, 'wishlist': wishlist,
+        'login_form': LoginForm()
+    })
+
+
+@login_required
+@require_POST
+def save_list_item(request, item_uuid):
+    item = Item.objects.get(uuid=item_uuid)
+    wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
+    if request.user == wishlist.owner:
+        form = ItemForm(data=request.POST, instance=item)
+        if form.is_valid():
+            form.save(for_list=wishlist, as_user=request.user)
+        else:
+            return redirect(item)
+    return redirect(item)
 
 
 @login_required

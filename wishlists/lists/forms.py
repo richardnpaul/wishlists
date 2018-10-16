@@ -39,10 +39,12 @@ class ItemForm(forms.ModelForm):
         }))
     price = forms.DecimalField(required=False, widget=forms.NumberInput(
         attrs={'class': 'form-control'}))
+    notes = forms.CharField(required=False, widget=forms.Textarea(
+        attrs={'class': 'form-control'}))
 
     class Meta:
         model = Item
-        fields = ('text', 'url', 'price', 'priority')
+        fields = ('text', 'url', 'price', 'priority', 'notes')
         widgets = {
             'text': forms.TextInput(
                 attrs={
@@ -58,11 +60,13 @@ class ItemForm(forms.ModelForm):
         }
         error_messages = {
             'text': {'required': EMPTY_ITEM_ERROR},
-            'priority': {'required': 'A priority must be submitted. Defaults to medium'},
+            'priority': {
+                'required': 'A priority must be submitted. Defaults to medium'
+            },
         }
 
     def save(self, for_list, as_user):
         self.instance.wishlist = for_list
         if not self.instance.wishlist.owner == as_user:
             raise ValidationError
-        return super().save()
+        return super(ItemForm, self).save()

@@ -30,6 +30,7 @@ class Wishlist(models.Model):
 
 
 class Item(models.Model):
+
     PRIORITY_CHOICES = (
         ('1', 'Highest'),
         ('2', 'High'),
@@ -46,7 +47,7 @@ class Item(models.Model):
                                 max_digits=16)
     priority = models.CharField(default='medium', choices=PRIORITY_CHOICES,
                                 max_length=1)
-    # notes = models.TextField()
+    notes = models.TextField(null=True)
     # date_added = models.DateTimeField()
     wishlist = models.ForeignKey(Wishlist, default=None,
                                  on_delete=models.CASCADE)

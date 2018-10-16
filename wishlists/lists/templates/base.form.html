@@ -47,6 +47,17 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                {% if form.notes.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.notes.errors }}</div>
+                                </div>
+                                {% endif %}
+                                <label for="{{ form.notes.id_for_label }}" class="col-md-2 col-form-label">Wish Notes: </label>
+                                <div class="col-md-10">
+                                    {{ form.notes }}
+                                </div>
+                            </div>
                             {% csrf_token %}
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>
