@@ -3,9 +3,9 @@
 {% block header_text %}Your item purchases{% endblock %}
 
 {% block table %}
-                <table class="table table-hover">
+                <table class="table table-hover table-responsive-md">
                     <thead class="thead-light">
-                        <tr class="d-flex text-center">
+                        <tr class="text-center">
                             <th class="col-auto col-md-8" scope="col">Desired Item</th>
                             <th class="col-auto col-md-1" scope="col">Price of Item</th>
                             <th class="col-auto col-md-2" scope="col">Priority of Item</th>
@@ -14,7 +14,7 @@
                     </thead>
                     <tbody>
                         {% for item in items %}
-                        <tr class="d-flex text-center">
+                        <tr class="text-center">
                             <td class="col-auto col-md-8" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
                             <td class="col-auto col-md-1">{% if item.price %}{{ item.price }}{% endif %}</td>
                             <td class="col-auto col-md-2">{{ item.get_priority_display }}</td>
