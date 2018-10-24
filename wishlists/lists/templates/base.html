@@ -70,25 +70,25 @@
                     </div>
                     {% elif user.is_authenticated %}
                     <div class="nav-item">
-                        <a href="{% url 'view_users' %}" class="nav-link btn btn-primary mr-2">View Users</a>
+                        <a href="{% url 'view_users' %}" class="nav-link btn btn-primary btn-md m-1" role="button">View Users</a>
                     </div>
                     <div class="nav-item">
-                        <a href="{% url 'view_my_lists' %}" class="nav-link btn btn-primary mr-2">My Lists</a>
+                        <a href="{% url 'view_my_lists' %}" class="nav-link btn btn-primary btn-md m-1" role="button">My Lists</a>
                     </div>
                     <div class="nav-item">
-                        <a href="{% url 'bought_items' %}" class="nav-link btn btn-primary">My Purchases</a>
+                        <a href="{% url 'bought_items' %}" class="nav-link btn btn-primary btn-md m-1" role="button">My Purchases</a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link disabled">{{ user.username }}</a>
+                        <a class="nav-link disabled w-100 text-center">{{ user.username }}</a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link active" href="{% url 'account_logout' %}">Logout</a>
+                        <a class="nav-link active w-100 text-center" href="{% url 'account_logout' %}">Logout</a>
                     </div>
                     {% endif %}
                     {% endblock %}
                 </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon "></span>
                 </button>
             </nav>
 
