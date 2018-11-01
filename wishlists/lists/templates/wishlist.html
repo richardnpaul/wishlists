@@ -31,7 +31,7 @@
                             {% endfor %}
                         {% else %}
                             {% for item in wishlist.item_set.all %}
-                                {% if not item.gifter or item.gifter == user %}
+                                {% if not item.gifter %}
                             <tr class="text-center">
                                 <td class="col-7" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
                                 <td class="col-1">{% if item.price %}{{ item.price }}{% endif %}</td>
