@@ -19,11 +19,11 @@
                     <table class="table">
                         {% for wishlist in lists %}
                         <tr>
-                            <td>{{ wishlist.title }}</td>
+                            <td>{% if wishlist.archived %}<del>{{ wishlist.title }}</del> - ARCHIVED{% else %}{{ wishlist.title }}{% endif %}</td>
                             <td><a href="{% url 'view_list' wishlist.uuid %}" class="btn btn-primary float-right" role="button">View</a>
                                 <form method="POST" action="{% url 'archive_list' wishlist.uuid %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger float-right mr-2" role="button">Archive</button>
+                                    <button type="submit" class="btn btn-danger float-right mr-2{% if wishlist.archived %} disabled{% endif %}" role="button">Archive</button>
                                 </form>
                             </td>
                         </tr>

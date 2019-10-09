@@ -31,8 +31,9 @@ def archive_list(request, wishlist_uuid):
     if not request.user.is_authenticated:
         return redirect('/accounts/login/')
     if request.user == wishlist.owner:
-        wishlist.archived = True
-        wishlist.save()
+        if not wishlist.archived:
+            wishlist.archived = True
+            wishlist.save()
         return redirect('view_my_lists')
     return redirect('view_my_lists')
 
