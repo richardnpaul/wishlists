@@ -26,7 +26,7 @@
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger float-right mr-2{% if wishlist.archived %} disabled{% endif %}" role="button">Archive</button>
                                 </form>
-                                {% end if %}
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
