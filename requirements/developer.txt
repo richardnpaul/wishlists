@@ -1,6 +1,7 @@
 -r base.txt
 
-flake8==3.5.0
-mccabe==0.6.1
-pycodestyle==2.4.0
-pyflakes==2.0.0
+flake8==3.7.8
+black
+mccabe
+pycodestyle==2.5.0
+pyflakes==2.1.1
