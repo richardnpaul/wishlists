@@ -3,7 +3,7 @@ from .models import Wishlist, Item
 
 
 class WishlistAdmin(admin.ModelAdmin):
-    list_display = ['uuid', 'owner',]
+    list_display = ['owner', 'title', 'uuid']
 
 
 class ItemAdmin(admin.ModelAdmin):
