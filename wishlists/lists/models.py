@@ -14,6 +14,8 @@ class Wishlist(models.Model):
                               on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
     shared = models.ManyToManyField(User)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('owner', 'title',)
@@ -53,6 +55,8 @@ class Item(models.Model):
                                  on_delete=models.CASCADE)
     gifter = models.ForeignKey(User, default=None, null=True,
                                on_delete=models.SET_DEFAULT)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ('priority','wishlist','id',)
