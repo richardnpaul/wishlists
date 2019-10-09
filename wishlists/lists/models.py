@@ -16,6 +16,7 @@ class Wishlist(models.Model):
     shared = models.ManyToManyField(User)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    archived = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('owner', 'title',)

@@ -25,6 +25,18 @@ def view_list(request, wishlist_uuid):
 
 
 @login_required
+@require_POST
+def archive_list(request, wishlist_uuid):
+    wishlist = Wishlist.objects.get(uuid=wishlist_uuid)
+    if not request.user.is_authenticated:
+        return redirect('/accounts/login/')
+    if request.user == wishlist.owner:
+        wishlist.archived = True
+        return redirect('view_my_lists')
+    return redirect('view_my_lists')
+
+
+@login_required
 @require_safe
 def view_my_lists(request):
     lists = Wishlist.objects.filter(owner=request.user).all()
@@ -36,7 +48,7 @@ def view_my_lists(request):
 @login_required
 @require_safe
 def view_users_lists(request, user_id):
-    lists = Wishlist.objects.filter(owner=user_id).all()
+    lists = Wishlist.objects.filter(owner=user_id, archived=False).all()
     return render(request, 'lists.html', {'lists': lists,
                                           'login_form': LoginForm()})
 
