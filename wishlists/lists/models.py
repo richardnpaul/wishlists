@@ -58,6 +58,7 @@ class Item(models.Model):
                                on_delete=models.SET_DEFAULT)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    archived = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('priority','wishlist','id',)
