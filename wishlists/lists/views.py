@@ -152,7 +152,8 @@ def archive_bought_items(request):
 @login_required
 @require_safe
 def view_all_bought_items(request):
-    items = Item.objects.filter(gifter=request.user).order_by('wishlist').all()
+    items = Item.objects.filter(
+        gifter=request.user, archived=False).order_by('wishlist').all()
     return render(request, 'bought_items.html', {'items': items,
                                                  'login_form': LoginForm()})
 
