@@ -50,8 +50,7 @@ class Item(models.Model):
                                 max_digits=16)
     priority = models.CharField(default='medium', choices=PRIORITY_CHOICES,
                                 max_length=1)
-    notes = models.TextField(null=True)
-    # date_added = models.DateTimeField()
+    notes = models.TextField(null=True, blank=True)
     wishlist = models.ForeignKey(Wishlist, default=None,
                                  on_delete=models.CASCADE)
     gifter = models.ForeignKey(User, default=None, null=True,
@@ -59,6 +58,9 @@ class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     archived = models.BooleanField(default=False)
+    ordered = models.BooleanField(default=False)
+    delivered = models.BooleanField(default=False)
+    wrapped = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('priority','wishlist','id',)
