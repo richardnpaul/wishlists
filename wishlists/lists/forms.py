@@ -54,7 +54,7 @@ class ItemForm(forms.ModelForm):
             ),
             'priority': forms.Select(
                 attrs={
-                    'class': 'form-check-input '
+                    'class': 'form-check-input'
                 }
             )
         }
@@ -70,3 +70,29 @@ class ItemForm(forms.ModelForm):
         if not self.instance.wishlist.owner == as_user:
             raise ValidationError
         return super(ItemForm, self).save()
+
+
+class BoughtItemForm(forms.ModelForm):
+
+    archived = forms.BooleanField(required=False, widget=forms.CheckboxInput(
+        attrs={'class': 'form-control-sm form-check-input'}
+    ))
+
+    class Meta:
+        model = Item
+        fields = ('text', 'archived',)
+        exclude = ['url', 'price', 'priority', 'notes', 'created',
+                    'modified', 'uuid', 'wishlist']
+        widgets = {
+            'text': forms.TextInput(attrs={'readonly':'readonly'}),
+            'archived': forms.CheckboxInput(
+                attrs={'class': 'form-control-sm form-check-input'}
+            )
+        }
+
+    def save(self, as_user):
+        self.instance.item = self.cleaned_data['id']
+        if not self.instance.item.gifter == as_user:
+            raise ValidationError
+        return super(BoughtItemForm, self).save()
+
