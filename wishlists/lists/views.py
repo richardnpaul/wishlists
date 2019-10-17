@@ -3,11 +3,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_safe
 from django.contrib.auth.models import User
-
+from django.forms.models import modelformset_factory
 
 # Local
 from .models import Wishlist, Item
-from .forms import ItemForm, WishListForm
+from .forms import ItemForm, WishListForm, BoughtItemForm
 from accounts.forms import LoginForm
 
 
@@ -123,6 +123,30 @@ def return_list_item(request, item_uuid):
         item.gifter = None
         item.save()
     return redirect(item)
+
+
+@login_required
+def archive_bought_items(request):
+    item_qs = Item.objects.filter(gifter=request.user).all()
+
+    BoughtItemFormSet = modelformset_factory(
+        Item, fields=('text', 'url', 'price', 'priority', 'notes', 'archived'),
+        form=BoughtItemForm, extra=0)
+
+    formset = BoughtItemFormSet(queryset=item_qs)
+
+    if request.method == 'POST':
+        formset = BoughtItemFormSet(request.POST, queryset=item_qs)
+        if formset.is_valid():
+            for form in formset:
+                form.save(as_user=request.user)
+            return redirect('archive_bought_items')
+        else:
+            return render(request, 'archive_bought_items.html',
+                          {'formset': formset, 'login_form': LoginForm()})
+
+    return render(request, 'archive_bought_items.html',
+                  {'formset': formset, 'login_form': LoginForm()})
 
 
 @login_required
