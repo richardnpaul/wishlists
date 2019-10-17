@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block header_text %}Your item purchases{% endblock %}
+
+{% block table %}
+                <a href="{% url 'bought_items' %}" class="btn btn-primary btn-md float-left mb-2" role="link" ><span class="glyphicon glyphicon-circle-arrow-left"></span>Back to Purchases</a>
+                <form method="post" action="{% url 'archive_bought_items' %}">
+                    {% csrf_token %}
+                    <table class="table table-hover table-responsive-md">
+                        <thead class="thead-light">
+                            <tr class="text-center">
+                                <th class="col-auto col-md-7" scope="col">Desired Item</th>
+                                <th class="col-auto col-md-1" scope="col">Archived</th>
+                                <th class="col-auto col-md-1" scope="col">
+                                    <input class="align-middle" type="checkbox" name="selectall" autocomplete="off" onclick="toggleCheckBoxes(this)" />
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                            <tr class="text-center">
+                            {% for field in form %}
+                                {% if field == form.text %}
+                                <td class="col-auto col-md-6">
+                                    {{ field }}{{ field.errors }}
+                                </td>
+                                {% elif field == form.archived %}
+                                <td class="col-auto col-md-1"><input class="align-middle" type="checkbox" {% if form.archived.value == True %}checked{% endif %} disabled /></td>
+                                <td class="col-auto col-md-1">
+                                    {{ field }}{{ field.errors }}
+                                </td>
+                                {% else %}
+                                    <span class="d-none">{{ field }}</span>
+                                {% endif %}
+                            {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary btn-md float-right" role="button">Change Archive Status</button>
+                </form>
+{% endblock %}
+
+{% block customjs %}
+        <script>
+        function toggleCheckBoxes(source) {
+            let checkboxes = document.getElementsByTagName("input");
+            for(let i = 1; i < checkboxes.length ; i++) {
+                if (checkboxes[i].getAttribute('type') === 'checkbox') {
+                    if (! checkboxes[i].disabled) {
+                        checkboxes[i].checked = source.checked;
+                    }
+                }
+            }
+        }
+        </script>
+{% endblock %}
