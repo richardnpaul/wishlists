@@ -24,7 +24,7 @@
                                 {% if user == wishlist.owner %}
                                 <form method="POST" action="{% url 'archive_list' wishlist.uuid %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger float-right mr-2{% if wishlist.archived %} disabled{% endif %}" role="button">Archive</button>
+                                    <input class="btn btn-danger float-right mr-2{% if wishlist.archived %} disabled{% endif %}" type="submit" value="Archive" role="button"{% if wishlist.archived %} disabled{% endif %} />
                                 </form>
                                 {% endif %}
                             </td>
