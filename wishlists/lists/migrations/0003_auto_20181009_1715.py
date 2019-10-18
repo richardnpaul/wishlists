@@ -5,22 +5,26 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('lists', '0002_auto_20181009_0420'),
-    ]
+    dependencies = [("lists", "0002_auto_20181009_0420")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='item',
-            options={'ordering': ('wishlist', 'priority', 'id')},
+            name="item", options={"ordering": ("wishlist", "priority", "id")}
         ),
-        migrations.RemoveField(
-            model_name='item',
-            name='number',
-        ),
+        migrations.RemoveField(model_name="item", name="number"),
         migrations.AlterField(
-            model_name='item',
-            name='priority',
-            field=models.CharField(choices=[('1', 'Highest'), ('2', 'High'), ('3', 'Medium'), ('4', 'Low'), ('5', 'Lowest')], default='medium', max_length=1),
+            model_name="item",
+            name="priority",
+            field=models.CharField(
+                choices=[
+                    ("1", "Highest"),
+                    ("2", "High"),
+                    ("3", "Medium"),
+                    ("4", "Low"),
+                    ("5", "Lowest"),
+                ],
+                default="medium",
+                max_length=1,
+            ),
         ),
     ]

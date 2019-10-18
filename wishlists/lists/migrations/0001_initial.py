@@ -10,48 +10,105 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
     operations = [
         migrations.CreateModel(
-            name='Item',
+            name="Item",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField()),
-                ('uuid', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
-                ('url', models.URLField()),
-                ('price', models.DecimalField(blank=True, decimal_places=2, max_digits=16, null=True)),
-                ('number', models.IntegerField(default=1)),
-                ('priority', models.CharField(choices=[('highest', 'Highest'), ('high', 'High'), ('medium', 'Medium'), ('low', 'Low'), ('lowest', 'Lowest')], default='medium', max_length=8)),
-                ('gifter', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField()),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, unique=True
+                    ),
+                ),
+                ("url", models.URLField()),
+                (
+                    "price",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=16, null=True
+                    ),
+                ),
+                ("number", models.IntegerField(default=1)),
+                (
+                    "priority",
+                    models.CharField(
+                        choices=[
+                            ("highest", "Highest"),
+                            ("high", "High"),
+                            ("medium", "Medium"),
+                            ("low", "Low"),
+                            ("lowest", "Lowest"),
+                        ],
+                        default="medium",
+                        max_length=8,
+                    ),
+                ),
+                (
+                    "gifter",
+                    models.ForeignKey(
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_DEFAULT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'ordering': ('wishlist', 'id'),
-            },
+            options={"ordering": ("wishlist", "id")},
         ),
         migrations.CreateModel(
-            name='Wishlist',
+            name="Wishlist",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uuid', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
-                ('title', models.CharField(max_length=128)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='wishlist_owner', to=settings.AUTH_USER_MODEL)),
-                ('shared', models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, unique=True
+                    ),
+                ),
+                ("title", models.CharField(max_length=128)),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="wishlist_owner",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                ("shared", models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AddField(
-            model_name='item',
-            name='wishlist',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='lists.Wishlist'),
+            model_name="item",
+            name="wishlist",
+            field=models.ForeignKey(
+                default=None,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="lists.Wishlist",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='wishlist',
-            unique_together={('owner', 'title')},
+            name="wishlist", unique_together={("owner", "title")}
         ),
         migrations.AlterUniqueTogether(
-            name='item',
-            unique_together={('text', 'wishlist')},
+            name="item", unique_together={("text", "wishlist")}
         ),
     ]

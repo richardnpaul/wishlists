@@ -5,14 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('lists', '0007_wishlist_archived'),
-    ]
+    dependencies = [("lists", "0007_wishlist_archived")]
 
     operations = [
         migrations.AddField(
-            model_name='item',
-            name='archived',
-            field=models.BooleanField(default=False),
-        ),
+            model_name="item", name="archived", field=models.BooleanField(default=False)
+        )
     ]

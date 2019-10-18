@@ -5,13 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('lists', '0003_auto_20181009_1715'),
-    ]
+    dependencies = [("lists", "0003_auto_20181009_1715")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='item',
-            options={'ordering': ('priority', 'wishlist', 'id')},
-        ),
+            name="item", options={"ordering": ("priority", "wishlist", "id")}
+        )
     ]
