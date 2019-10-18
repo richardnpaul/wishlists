@@ -3,15 +3,14 @@
 {% block header_text %}Your item purchases{% endblock %}
 
 {% block table %}
-                <a href="{% url 'return_bought_items' %}" class="btn btn-primary btn-md float-right mb-2 ml-2" role="link">Return Purchase</a>
-                <a href="{% url 'archive_bought_items' %}" class="btn btn-primary btn-md float-right mb-2" role="link">Archive Purchases</a>
+                <a href="{% url 'bought_items' %}" class="btn btn-primary btn-md float-left mb-2" role="link" ><span class="glyphicon glyphicon-circle-arrow-left"></span>Back to Purchases</a>
                 <table class="table table-hover table-responsive-md">
                     <thead class="thead-light">
                         <tr class="text-center">
                             <th class="col-auto col-md-8" scope="col">Desired Item</th>
-                            <th class="col-auto col-md-1" scope="col">Ordered</th>
-                            <th class="col-auto col-md-1" scope="col">Delivered</th>
-                            <th class="col-auto col-md-1" scope="col">Wrapped</th>
+                            <th class="col-auto col-md-1" scope="col">Price of Item</th>
+                            <th class="col-auto col-md-1" scope="col">Priority of Item</th>
+                            <th class="col-auto col-md-2" scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -20,9 +19,14 @@
                             <td class="col-auto col-md-6" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>
                                 {% if item.url %}<a href="{{ item.url }}">{{ item.text }} ({{ item.wishlist.owner.first_name }})</a>{% else %}{{ item.text }} ({{ item.wishlist.owner.first_name }}){% endif %}
                             </td>
-                            <td class="col-auto col-md-1"></td>
-                            <td class="col-auto col-md-1"></td>
-                            <td class="col-auto col-md-1"></td>
+                            <td class="col-auto col-md-1">{% if item.price %}{{ item.price }}{% endif %}</td>
+                            <td class="col-auto col-md-1">{{ item.get_priority_display }}</td>
+                            <td class="col-auto col-md-2">
+                                <form method="POST" action="{% url 'return_list_item' item.uuid %}">
+                                    {% csrf_token %}
+                                    <input class="form-control btn btn-danger" type="submit" value="Return" role="button" />
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

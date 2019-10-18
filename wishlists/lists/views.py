@@ -159,6 +159,15 @@ def view_all_bought_items(request):
 
 
 @login_required
+@require_safe
+def return_bought_items(request):
+    items = Item.objects.filter(
+        gifter=request.user, archived=False).order_by('wishlist').all()
+    return render(request, 'return_bought_items.html', {
+        'items': items, 'login_form': LoginForm()})
+
+
+@login_required
 def new_list(request):
     if request.POST:
         form = WishListForm(data=request.POST)

@@ -28,6 +28,7 @@ urlpatterns = [
          name='edit_list_item'),
     path('item/<uuid:item_uuid>/save/', views.save_list_item,
          name='save_list_item'),
+    path('items/return/', views.return_bought_items, name='return_bought_items'),
     path('items/archive/', views.archive_bought_items, name='archive_bought_items'),
     path('items/', views.view_all_bought_items, name='bought_items'),
 
