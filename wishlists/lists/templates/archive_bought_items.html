@@ -23,7 +23,7 @@
                             {% for field in form %}
                                 {% if field == form.text %}
                                 <td class="col-auto col-md-6">
-                                    {{ field }}{{ field.errors }}
+                                    {{ field.value }}<span class="d-none">{{ field }}{{ field.errors }}</span>
                                 </td>
                                 {% elif field == form.archived %}
                                 <td class="col-auto col-md-1"><input class="align-middle" type="checkbox" {% if form.archived.value == True %}checked{% endif %} disabled /></td>

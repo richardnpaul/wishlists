@@ -75,7 +75,7 @@ class ItemForm(forms.ModelForm):
 class BoughtItemForm(forms.ModelForm):
 
     archived = forms.BooleanField(required=False, widget=forms.CheckboxInput(
-        attrs={'class': 'form-control-sm form-check-input'}
+        attrs={'class': 'form-control-sm form-check-input m-0'}
     ))
 
     class Meta:
@@ -85,9 +85,7 @@ class BoughtItemForm(forms.ModelForm):
                     'modified', 'uuid', 'wishlist']
         widgets = {
             'text': forms.TextInput(attrs={'readonly':'readonly'}),
-            'archived': forms.CheckboxInput(
-                attrs={'class': 'form-control-sm form-check-input'}
-            )
+            'archived': forms.CheckboxInput()
         }
 
     def save(self, as_user):
