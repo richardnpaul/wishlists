@@ -121,6 +121,10 @@ def return_list_item(request, item_uuid):
     item = Item.objects.get(uuid=item_uuid)
     if item.gifter == request.user:
         item.gifter = None
+        item.archived = False
+        item.ordered = False
+        item.delivered = False
+        item.wrapped = False
         item.save()
     return redirect(item)
 
