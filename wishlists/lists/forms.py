@@ -72,7 +72,7 @@ class ItemForm(forms.ModelForm):
         return super(ItemForm, self).save()
 
 
-class BoughtItemForm(forms.ModelForm):
+class ArchiveItemForm(forms.ModelForm):
 
     archived = forms.BooleanField(required=False, widget=forms.CheckboxInput(
         attrs={'class': 'form-control-sm form-check-input m-0'}
@@ -82,7 +82,8 @@ class BoughtItemForm(forms.ModelForm):
         model = Item
         fields = ('text', 'archived',)
         exclude = ['url', 'price', 'priority', 'notes', 'created',
-                    'modified', 'uuid', 'wishlist']
+                    'modified', 'uuid', 'wishlist', 'ordered', 'delivered',
+                   'wrapped']
         widgets = {
             'text': forms.TextInput(attrs={'readonly':'readonly'}),
             'archived': forms.CheckboxInput()
@@ -92,5 +93,41 @@ class BoughtItemForm(forms.ModelForm):
         self.instance.item = self.cleaned_data['id']
         if not self.instance.item.gifter == as_user:
             raise ValidationError
-        return super(BoughtItemForm, self).save()
+        return super(ArchiveItemForm, self).save()
 
+
+class BoughtItemForm(forms.ModelForm):
+
+    text = forms.CharField(required=False)
+    url = forms.URLField(required=False)
+    notes = forms.CharField(required=False)
+
+    ordered = forms.BooleanField(required=False, widget=forms.CheckboxInput(
+        attrs={'class': 'form-control-sm form-check-input m-0'}
+    ))
+    delivered = forms.BooleanField(required=False, widget=forms.CheckboxInput(
+        attrs={'class': 'form-control-sm form-check-input m-0'}
+    ))
+    wrapped = forms.BooleanField(required=False, widget=forms.CheckboxInput(
+        attrs={'class': 'form-control-sm form-check-input m-0'}
+    ))
+
+    class Meta:
+        model = Item
+        fields = ['text', 'url', 'notes', 'ordered', 'delivered', 'wrapped']
+        exclude = ['price', 'priority', 'created', 'modified', 'uuid',
+                   'wishlist', 'archived']
+        widgets = {
+            'text': forms.TextInput(attrs={'readonly':'readonly'}),
+            'url': forms.Textarea(attrs={'readonly':'readonly'}),
+            'notes': forms.Textarea(attrs={'readonly':'readonly'}),
+            'ordered': forms.CheckboxInput(),
+            'delivered': forms.CheckboxInput(),
+            'wrapped': forms.CheckboxInput(),
+        }
+
+    def save(self, as_user):
+        self.instance.item = self.cleaned_data['id']
+        if not self.instance.item.gifter == as_user:
+            raise ValidationError
+        return super(BoughtItemForm, self).save()

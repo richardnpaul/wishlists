@@ -7,7 +7,7 @@ from django.forms.models import modelformset_factory
 
 # Local
 from .models import Wishlist, Item
-from .forms import ItemForm, WishListForm, BoughtItemForm
+from .forms import ItemForm, WishListForm, ArchiveItemForm, BoughtItemForm
 from accounts.forms import LoginForm
 
 
@@ -129,14 +129,14 @@ def return_list_item(request, item_uuid):
 def archive_bought_items(request):
     item_qs = Item.objects.filter(gifter=request.user).all()
 
-    BoughtItemFormSet = modelformset_factory(
+    ArchiveItemFormSet = modelformset_factory(
         Item, fields=('text', 'url', 'price', 'priority', 'notes', 'archived'),
-        form=BoughtItemForm, extra=0)
+        form=ArchiveItemForm, extra=0)
 
-    formset = BoughtItemFormSet(queryset=item_qs)
+    formset = ArchiveItemFormSet(queryset=item_qs)
 
     if request.method == 'POST':
-        formset = BoughtItemFormSet(request.POST, queryset=item_qs)
+        formset = ArchiveItemFormSet(request.POST, queryset=item_qs)
         if formset.is_valid():
             for form in formset:
                 form.save(as_user=request.user)
@@ -150,12 +150,28 @@ def archive_bought_items(request):
 
 
 @login_required
-@require_safe
 def view_all_bought_items(request):
-    items = Item.objects.filter(
+    item_qs = Item.objects.filter(
         gifter=request.user, archived=False).order_by('wishlist').all()
-    return render(request, 'bought_items.html', {'items': items,
-                                                 'login_form': LoginForm()})
+
+    BoughtItemFormSet = modelformset_factory(Item,
+        fields=('text', 'url', 'notes', 'ordered', 'delivered', 'wrapped'),
+        form=BoughtItemForm, extra=0)
+
+    formset = BoughtItemFormSet(queryset=item_qs)
+
+    if request.method == 'POST':
+        formset = BoughtItemFormSet(request.POST, queryset=item_qs)
+        if formset.is_valid():
+            for form in formset:
+                form.save(as_user=request.user)
+            return redirect('bought_items')
+        else:
+            return render(request, 'bought_items.html',
+                          {'formset': formset, 'login_form': LoginForm()})
+
+    return render(request, 'bought_items.html',
+                  {'formset': formset, 'login_form': LoginForm()})
 
 
 @login_required
