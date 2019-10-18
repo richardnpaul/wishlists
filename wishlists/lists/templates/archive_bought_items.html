@@ -3,7 +3,7 @@
 {% block header_text %}Your item purchases{% endblock %}
 
 {% block table %}
-                <a href="{% url 'bought_items' %}" class="btn btn-primary btn-md float-left mb-2" role="link" ><span class="glyphicon glyphicon-circle-arrow-left"></span>Back to Purchases</a>
+                <a href="{% url 'bought_items' %}" class="btn btn-primary btn-md float-left mb-2" role="link" >◄ Back to Purchases</a>
                 <form method="post" action="{% url 'archive_bought_items' %}">
                     {% csrf_token %}
                     <table class="table table-hover table-responsive-md">

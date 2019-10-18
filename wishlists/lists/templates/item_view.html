@@ -8,6 +8,7 @@
                         {% endblock %}
 
                         {% block table %}
+                        <a href="{% url 'view_list' wishlist.uuid %}" class="btn btn-primary btn-md float-left mb-2" role="link" >◄ Back to {{ wishlist.owner.first_name }}'s wishlist</a>
                         <table class="table table-hover table-responsive-md">
                             <thead class="thead-light">
                                 <tr class="text-center">
