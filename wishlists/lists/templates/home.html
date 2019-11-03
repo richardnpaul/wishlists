@@ -22,6 +22,7 @@
                                 <div class="form-text">{{ wishlist_form.title.errors }}</div>
                             </div>
                             {% endif %}
+                            <input class="btn btn-primary align-center mt-3" role="button" type="submit" value="Create Wishlist" />
                         </form>
                         <table class="table">
                             {% for wishlist in user.wishlist_set.all %}
@@ -35,4 +36,3 @@
                         <p class="">Log in using the login button to create a new list, or register <a href="{% url 'account_registration' %}">here</a>.</p>
                         {% endif %}
 {% endblock %}
-
