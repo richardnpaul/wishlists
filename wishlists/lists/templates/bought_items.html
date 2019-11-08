@@ -10,7 +10,8 @@
                     <table class="table table-hover table-responsive-md">
                         <thead class="thead-light">
                             <tr class="text-center">
-                                <th class="col-auto col-md-8" scope="col">Desired Item</th>
+                                <th class="col-auto col-md-7" scope="col">Desired Item</th>
+                                <th class="col-auto col-md-1" scope="col">Price</th>
                                 <th class="col-auto col-md-1" scope="col">Ordered</th>
                                 <th class="col-auto col-md-1" scope="col">Delivered</th>
                                 <th class="col-auto col-md-1" scope="col">Wrapped</th>
@@ -21,7 +22,7 @@
                             {% for form in formset %}
                             <tr class="text-center">
                                 <td class="col-auto col-md-6" {% if form.notes %}data-toggle="tooltip" data-placement="right" title="{{ form.notes.value }}"{% endif %}>
-                                {% if form.url %}
+                                {% if form.url.value %}
                                     <a href="{{ form.url.value }}">{{ form.text.value }} ({{ form.instance.wishlist.owner.first_name }})</a>
                                 {% else %}
                                     {{ form.text.value }} ({{ form.instance.wishlist.owner.first_name }})
@@ -32,6 +33,7 @@
                                         {{ form.notes }}{{ form.notes.errors }}
                                     </span>
                                 </td>
+                                <td class="col-auto col-md-1">{{ form.instance.price }}</td>
                                 <td class="col-auto col-md-1">{{ form.ordered }}</td>
                                 <td class="col-auto col-md-1">{{ form.delivered }}</td>
                                 <td class="col-auto col-md-1">{{ form.wrapped }}</td>
