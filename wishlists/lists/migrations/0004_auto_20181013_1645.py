@@ -7,8 +7,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("lists", "0003_auto_20181009_1715")]
 
-    operations = [
-        migrations.AlterModelOptions(
-            name="item", options={"ordering": ("priority", "wishlist", "id")}
-        )
-    ]
+    operations = [migrations.AlterModelOptions(name="item", options={"ordering": ("priority", "wishlist", "id")})]

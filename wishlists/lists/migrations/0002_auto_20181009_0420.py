@@ -9,8 +9,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="item",
-            name="url",
-            field=models.URLField(blank=True, default="", max_length=500),
+            model_name="item", name="url", field=models.URLField(blank=True, default="", max_length=500)
         )
     ]

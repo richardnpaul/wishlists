@@ -16,29 +16,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Item",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("text", models.TextField()),
-                (
-                    "uuid",
-                    models.UUIDField(
-                        db_index=True, default=uuid.uuid4, editable=False, unique=True
-                    ),
-                ),
+                ("uuid", models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
                 ("url", models.URLField()),
-                (
-                    "price",
-                    models.DecimalField(
-                        blank=True, decimal_places=2, max_digits=16, null=True
-                    ),
-                ),
+                ("price", models.DecimalField(blank=True, decimal_places=2, max_digits=16, null=True)),
                 ("number", models.IntegerField(default=1)),
                 (
                     "priority",
@@ -69,21 +51,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Wishlist",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "uuid",
-                    models.UUIDField(
-                        db_index=True, default=uuid.uuid4, editable=False, unique=True
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("uuid", models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
                 ("title", models.CharField(max_length=128)),
                 (
                     "owner",
@@ -99,16 +68,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="item",
             name="wishlist",
-            field=models.ForeignKey(
-                default=None,
-                on_delete=django.db.models.deletion.CASCADE,
-                to="lists.Wishlist",
-            ),
+            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to="lists.Wishlist"),
         ),
-        migrations.AlterUniqueTogether(
-            name="wishlist", unique_together={("owner", "title")}
-        ),
-        migrations.AlterUniqueTogether(
-            name="item", unique_together={("text", "wishlist")}
-        ),
+        migrations.AlterUniqueTogether(name="wishlist", unique_together={("owner", "title")}),
+        migrations.AlterUniqueTogether(name="item", unique_together={("text", "wishlist")}),
     ]

@@ -12,27 +12,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="item",
             name="created",
-            field=models.DateTimeField(
-                auto_now_add=True, default=django.utils.timezone.now
-            ),
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
-        migrations.AddField(
-            model_name="item",
-            name="modified",
-            field=models.DateTimeField(auto_now=True),
-        ),
+        migrations.AddField(model_name="item", name="modified", field=models.DateTimeField(auto_now=True)),
         migrations.AddField(
             model_name="wishlist",
             name="created",
-            field=models.DateTimeField(
-                auto_now_add=True, default=django.utils.timezone.now
-            ),
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
-        migrations.AddField(
-            model_name="wishlist",
-            name="modified",
-            field=models.DateTimeField(auto_now=True),
-        ),
+        migrations.AddField(model_name="wishlist", name="modified", field=models.DateTimeField(auto_now=True)),
     ]

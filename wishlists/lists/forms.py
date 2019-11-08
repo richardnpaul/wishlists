@@ -14,15 +14,10 @@ class WishListForm(forms.ModelForm):
         fields = ("title",)
         widgets = {
             "title": forms.TextInput(
-                attrs={
-                    "placeholder": "Enter a title for your wishlist here",
-                    "class": "form-control imput-lg",
-                }
+                attrs={"placeholder": "Enter a title for your wishlist here", "class": "form-control imput-lg"}
             )
         }
-        error_messages = {
-            "title": {"required": "You can't have an empty wishlist title"}
-        }
+        error_messages = {"title": {"required": "You can't have an empty wishlist title"}}
 
     def save(self, as_user):
         self.instance.owner = as_user
@@ -35,36 +30,22 @@ class ItemForm(forms.ModelForm):
         max_length=500,
         required=False,
         widget=forms.URLInput(
-            attrs={
-                "placeholder": "Enter a the website address to a wishlist item here",
-                "class": "form-control",
-            }
+            attrs={"placeholder": "Enter a the website address to a wishlist item here", "class": "form-control"}
         ),
     )
-    price = forms.DecimalField(
-        required=False, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
-    notes = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
+    price = forms.DecimalField(required=False, widget=forms.NumberInput(attrs={"class": "form-control"}))
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "form-control"}))
 
     class Meta:
         model = Item
         fields = ("text", "url", "price", "priority", "notes")
         widgets = {
-            "text": forms.TextInput(
-                attrs={
-                    "placeholder": "Enter a wishlist item here",
-                    "class": "form-control",
-                }
-            ),
+            "text": forms.TextInput(attrs={"placeholder": "Enter a wishlist item here", "class": "form-control"}),
             "priority": forms.Select(attrs={"class": "form-check-input"}),
         }
         error_messages = {
             "text": {"required": EMPTY_ITEM_ERROR},
-            "priority": {
-                "required": "A priority must be submitted. Defaults to medium"
-            },
+            "priority": {"required": "A priority must be submitted. Defaults to medium"},
         }
 
     def save(self, for_list, as_user):
@@ -77,10 +58,7 @@ class ItemForm(forms.ModelForm):
 class ArchiveItemForm(forms.ModelForm):
 
     archived = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"})
     )
 
     class Meta:
@@ -99,10 +77,7 @@ class ArchiveItemForm(forms.ModelForm):
             "delivered",
             "wrapped",
         ]
-        widgets = {
-            "text": forms.TextInput(attrs={"readonly": "readonly"}),
-            "archived": forms.CheckboxInput(),
-        }
+        widgets = {"text": forms.TextInput(attrs={"readonly": "readonly"}), "archived": forms.CheckboxInput()}
 
     def save(self, as_user):
         self.instance.item = self.cleaned_data["id"]
@@ -118,36 +93,19 @@ class BoughtItemForm(forms.ModelForm):
     notes = forms.CharField(required=False)
 
     ordered = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"})
     )
     delivered = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"})
     )
     wrapped = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"})
     )
 
     class Meta:
         model = Item
         fields = ["text", "url", "notes", "ordered", "delivered", "wrapped"]
-        exclude = [
-            "price",
-            "priority",
-            "created",
-            "modified",
-            "uuid",
-            "wishlist",
-            "archived",
-        ]
+        exclude = ["price", "priority", "created", "modified", "uuid", "wishlist", "archived"]
         widgets = {
             "text": forms.TextInput(attrs={"readonly": "readonly"}),
             "url": forms.Textarea(attrs={"readonly": "readonly"}),

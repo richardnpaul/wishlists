@@ -16,9 +16,7 @@ urlpatterns = [
     # Items
     path("item/<uuid:item_uuid>/", views.view_list_item, name="view_list_item"),
     path("item/<uuid:item_uuid>/buy/", views.buy_list_item, name="buy_list_item"),
-    path(
-        "item/<uuid:item_uuid>/return/", views.return_list_item, name="return_list_item"
-    ),
+    path("item/<uuid:item_uuid>/return/", views.return_list_item, name="return_list_item"),
     path("item/<uuid:item_uuid>/edit/", views.edit_list_item, name="edit_list_item"),
     path("item/<uuid:item_uuid>/save/", views.save_list_item, name="save_list_item"),
     path("items/return/", views.return_bought_items, name="return_bought_items"),

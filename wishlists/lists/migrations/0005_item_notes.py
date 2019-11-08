@@ -7,8 +7,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("lists", "0004_auto_20181013_1645")]
 
-    operations = [
-        migrations.AddField(
-            model_name="item", name="notes", field=models.TextField(null=True)
-        )
-    ]
+    operations = [migrations.AddField(model_name="item", name="notes", field=models.TextField(null=True))]

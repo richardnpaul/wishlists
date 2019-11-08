@@ -7,10 +7,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("lists", "0006_auto_20191009_1805")]
 
-    operations = [
-        migrations.AddField(
-            model_name="wishlist",
-            name="archived",
-            field=models.BooleanField(default=False),
-        )
-    ]
+    operations = [migrations.AddField(model_name="wishlist", name="archived", field=models.BooleanField(default=False))]
