@@ -26,5 +26,5 @@ jobs:
     - name: Test with pytest
       run: |
         pip install selenium
-        export DJANGO_SETTINGS_MODULE=mysite.settings
+        export DJANGO_SETTINGS_MODULE=wishlists.settings
         wishlists/manage.py test
