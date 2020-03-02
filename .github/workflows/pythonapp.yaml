@@ -25,6 +25,6 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pip install selenium
+        pip install -r requirements/base.txt
         export DJANGO_SETTINGS_MODULE=wishlists.settings
         wishlists/manage.py test
