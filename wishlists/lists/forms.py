@@ -1,9 +1,9 @@
-# Django
+# Django Imports
 from django import forms
-from django.core.exceptions import ValidationError
 
 # Local
 from .models import Item, Wishlist
+
 
 EMPTY_ITEM_ERROR = "You can't have an empty wishlist item"
 
@@ -51,7 +51,7 @@ class ItemForm(forms.ModelForm):
     def save(self, for_list, as_user):
         self.instance.wishlist = for_list
         if not self.instance.wishlist.owner == as_user:
-            raise ValidationError
+            raise forms.ValidationError
         return super(ItemForm, self).save()
 
 
@@ -82,7 +82,7 @@ class ArchiveItemForm(forms.ModelForm):
     def save(self, as_user):
         self.instance.item = self.cleaned_data["id"]
         if not self.instance.item.gifter == as_user:
-            raise ValidationError
+            raise forms.ValidationError
         return super(ArchiveItemForm, self).save()
 
 
@@ -118,5 +118,5 @@ class BoughtItemForm(forms.ModelForm):
     def save(self, as_user):
         self.instance.item = self.cleaned_data["id"]
         if not self.instance.item.gifter == as_user:
-            raise ValidationError
+            raise forms.ValidationError
         return super(BoughtItemForm, self).save()
