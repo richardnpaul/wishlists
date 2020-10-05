@@ -1,10 +1,12 @@
+# Django Imports
 from django.urls import path
 
 from . import views
 
+
 urlpatterns = [
     path("new/", views.new_list, name="new_list"),
-    # Wishlist lists
+    # Wishlist Lists
     path("lists/", views.view_my_lists, name="view_my_lists"),
     path("lists/<int:user_id>/", views.view_users_lists, name="view_users_lists"),
     # Users
@@ -13,6 +15,7 @@ urlpatterns = [
     path("<uuid:wishlist_uuid>/", views.view_list, name="view_list"),
     path("<uuid:wishlist_uuid>/archive/", views.archive_list, name="archive_list"),
     path("<uuid:wishlist_uuid>/edit/", views.edit_list, name="edit_list"),
+    path("<uuid:wishlist_uuid>/item/create/", views.create_list_item, name="create_list_item"),
     # Items
     path("item/<uuid:item_uuid>/", views.view_list_item, name="view_list_item"),
     path("item/<uuid:item_uuid>/buy/", views.buy_list_item, name="buy_list_item"),
