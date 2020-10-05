@@ -51,7 +51,9 @@ class Item(models.Model):
 
     class Meta:
         ordering = ("priority", "wishlist", "id")
-        unique_together = ("text", "wishlist")
+        constraints = [
+            models.UniqueConstraint(fields=["text", "wishlist", "uuid"], name="Unique wishlist items"),
+        ]
 
     def get_absolute_url(self):
         return reverse("view_list_item", args=[self.uuid])
