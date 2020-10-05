@@ -1,9 +1,10 @@
-# Django
-from django.urls import path, include
+# Django Imports
 from django.contrib.auth import views as auth_views
+from django.urls import include, path
 
 # Local
 from . import views
+
 
 urlpatterns = [
     path("login/", views.account_login, name="account_login"),

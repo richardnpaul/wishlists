@@ -1,9 +1,9 @@
-# Django
+# Django Imports
 from django.test import TestCase
 
 # Local
-from ..forms import ItemForm, EMPTY_ITEM_ERROR
-from ..models import Wishlist, Item
+from ..forms import EMPTY_ITEM_ERROR, ItemForm
+from ..models import Item, Wishlist
 
 
 class ItemFormTest(TestCase):

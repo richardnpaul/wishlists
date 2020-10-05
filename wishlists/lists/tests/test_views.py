@@ -1,10 +1,10 @@
-# Django
+# Django Imports
 from django.test import TestCase
 from django.utils.html import escape
 
+from ..forms import EMPTY_ITEM_ERROR, ItemForm
 # Local
 from ..models import Item, Wishlist
-from ..forms import ItemForm, EMPTY_ITEM_ERROR
 
 
 class HomePageTest(TestCase):

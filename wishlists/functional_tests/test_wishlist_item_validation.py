@@ -1,4 +1,4 @@
-# 3rd party packages
+# Third-party Imports
 from selenium.webdriver.common.keys import Keys
 
 # Local

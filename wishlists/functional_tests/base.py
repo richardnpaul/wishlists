@@ -1,13 +1,14 @@
-# System packages
+# Standard Library Imports
 import time
 
-# Django includes
+# Django Imports
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-# 3rd party packages
+# Third-party Imports
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.keys import Keys
+
 
 MAX_WAIT = 10
 

@@ -1,18 +1,20 @@
-# Django
-from django.shortcuts import render, redirect
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes
-from django.http import HttpResponseRedirect
-from django.contrib.auth import login, logout, authenticate
+# Django Imports
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
+# Third-party Imports
+from lists.forms import ItemForm
 
 # Local
 from .forms import LoginForm, RegistrationForm
 from .tokens import account_activation_token
-from lists.forms import ItemForm
 
 
 def account_logout(request):
@@ -62,7 +64,7 @@ def account_registration(request):
             user.email_user(subject, message)
 
             check_mail_msg = f"""
-            Please check your email account for your {current_site.domain} 
+            Please check your email account for your {current_site.domain}
             account confirmation email"""
             return render(
                 request, "home.html", {"messages": check_mail_msg, "form": ItemForm(), "login_form": LoginForm()}

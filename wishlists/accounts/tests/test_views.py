@@ -1,4 +1,4 @@
-# Django
+# Django Imports
 from django.test import TestCase
 
 

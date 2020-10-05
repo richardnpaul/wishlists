@@ -1,6 +1,6 @@
-# Django
-from django.test import TestCase
+# Django Imports
 from django.contrib.auth.models import User
+from django.test import TestCase
 
 # Local
 from ..forms import LoginForm

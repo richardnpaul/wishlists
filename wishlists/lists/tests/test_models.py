@@ -1,6 +1,6 @@
-# Django
-from django.test import TestCase
+# Django Imports
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 
 # Local
 from ..models import Item, Wishlist
