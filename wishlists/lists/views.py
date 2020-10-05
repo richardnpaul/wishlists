@@ -1,14 +1,17 @@
-# Django
-from django.shortcuts import render, redirect, get_object_or_404
+# Django Imports
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST, require_safe
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 from django.forms.models import modelformset_factory
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST, require_safe
+
+# Third-party Imports
+from accounts.forms import LoginForm
 
 # Local
-from .models import Wishlist, Item
-from .forms import ItemForm, WishListForm, ArchiveItemForm, BoughtItemForm
-from accounts.forms import LoginForm
+from .forms import ArchiveItemForm, BoughtItemForm, ItemForm, WishListForm
+from .models import Item, Wishlist
 
 
 @require_safe
@@ -200,4 +203,17 @@ def edit_list(request, wishlist_uuid):
         if form.is_valid():
             form.save(for_list=wishlist, as_user=request.user)
             return redirect(f"/wishlists/{wishlist.uuid}/edit/")
+    return render(request, "edit_wishlist.html", {"wishlist": wishlist, "form": form, "login_form": LoginForm()})
+
+
+@login_required
+@require_POST
+def create_list_item(request, wishlist_uuid):
+    wishlist = Wishlist.objects.get(uuid=wishlist_uuid)
+    form = ItemForm(data=request.POST)
+
+    if form.is_valid():
+        form.save(for_list=wishlist, as_user=request.user)
+        return redirect(f"/wishlists/{wishlist.uuid}/edit/")
+
     return render(request, "edit_wishlist.html", {"wishlist": wishlist, "form": form, "login_form": LoginForm()})
