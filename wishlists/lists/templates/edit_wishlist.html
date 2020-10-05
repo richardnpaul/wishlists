@@ -2,7 +2,7 @@
 
 {% block header_text %}{{ wishlist.title }}{% endblock %}
 
-{% block form_action %}{% url 'edit_list' wishlist.uuid %}{% endblock %}
+{% block form_action %}{% url 'create_list_item' wishlist.uuid %}{% endblock %}
 
 {% block table %}
                     <table class="table table-hover table-responsive-md">
