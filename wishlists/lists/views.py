@@ -11,7 +11,7 @@ from accounts.forms import LoginForm
 
 # Local
 from .forms import ArchiveItemForm, BoughtItemForm, ItemForm, WishListForm
-from .models import Item, Wishlist
+from .models import Item, Wishlist, Gifter
 
 
 @require_safe
@@ -56,7 +56,7 @@ def view_users_lists(request, user_id):
 @login_required
 @require_safe
 def view_users(request):
-    users = User.objects.filter(is_superuser=False).all()
+    users = User.objects.filter(is_superuser=False, is_active=True).all()
     wishlists = Wishlist.objects.all()
     return render(request, "view_users.html", {"users": users, "wishlists": wishlists, "login_form": LoginForm()})
 
@@ -101,11 +101,25 @@ def save_list_item(request, item_uuid):
 @login_required
 @require_POST
 def buy_list_item(request, item_uuid):
+    quantity_bought = int(request.POST['quantity'])
     item = Item.objects.get(uuid=item_uuid)
-    wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
-    if not item.gifter and not request.user == wishlist.owner:
-        item.gifter = request.user
+    wishlist = Wishlist.objects.get(item__uuid=item_uuid)
+    print(item.get_bought_quantity())
+    if quantity_bought <= (item.quantity - item.get_bought_quantity()):
+        item.quantity_bought = item.quantity_bought + quantity_bought
         item.save()
+    else:
+        raise ValidationError("You're trying to buy more items the giftee wants!")
+    if not request.user == wishlist.owner:
+        if not request.user in Gifter.objects.filter(gifter=request.user, item=item):
+            gifter, created = Gifter.objects.get_or_create(gifter=request.user, item=item)
+            if created:
+                gifter.quantity = quantity_bought
+            else:
+                current_quantity = gifter.quantity
+                new_quantity = current_quantity + quantity_bought
+                gifter.quantity = new_quantity
+            gifter.save()
         return redirect(item)
     else:
         return redirect(wishlist)

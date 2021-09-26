@@ -34,11 +34,13 @@ class ItemForm(forms.ModelForm):
         ),
     )
     price = forms.DecimalField(required=False, widget=forms.NumberInput(attrs={"class": "form-control"}))
+    quantity = forms.IntegerField(
+        required=False, min_value=1, max_value=999, widget=forms.NumberInput(attrs={"class": "form-control"}))
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "form-control"}))
 
     class Meta:
         model = Item
-        fields = ("text", "url", "price", "priority", "notes")
+        fields = ("text", "url", "price", "quantity", "priority", "notes")
         widgets = {
             "text": forms.TextInput(attrs={"placeholder": "Enter a wishlist item here", "class": "form-control"}),
             "priority": forms.Select(attrs={"class": "form-check-input"}),

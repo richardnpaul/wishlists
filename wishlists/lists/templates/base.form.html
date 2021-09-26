@@ -48,6 +48,17 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                {% if form.quantity.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.quantity.errors }}</div>
+                                </div>
+                                {% endif %}
+                                <label for="{{ form.quantity.id_for_label }}" class="col-md-2 col-form-label">Quantity: </label>
+                                <div class="col-md-10">
+                                    {{ form.quantity }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 {% if form.notes.errors %}
                                 <div class="form-group has-error">
                                     <div class="form-text">{{ form.notes.errors }}</div>
