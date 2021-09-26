@@ -56,7 +56,7 @@ def view_users_lists(request, user_id):
 @login_required
 @require_safe
 def view_users(request):
-    users = User.objects.filter(is_superuser=False).all()
+    users = User.objects.filter(is_active=True, is_superuser=False, is_staff=False).all()
     wishlists = Wishlist.objects.all()
     return render(request, "view_users.html", {"users": users, "wishlists": wishlists, "login_form": LoginForm()})
 
