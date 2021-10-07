@@ -57,7 +57,7 @@ def account_registration(request):
                 {
                     "user": user,
                     "domain": current_site.domain,
-                    "uid": urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
                     "token": account_activation_token.make_token(user),
                 },
             )
