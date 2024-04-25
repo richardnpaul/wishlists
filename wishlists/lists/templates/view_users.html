@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header_text %}My wishlists{% endblock %}
+
+{% block table %}
+
+                    <table class="table">
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td><a href="{% url 'view_users_lists' user.id %}" class="btn btn-primary float-right" role="button">View Lists</a></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+
+{% endblock %}

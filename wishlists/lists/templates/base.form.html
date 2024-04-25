@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+                        {% block main %}
+                        <form method="POST" action="{% block form_action %}{% endblock %}" novalidate>
+                            {{ form.non_field_errors }}
+                            <div class="form-group row">
+                                {% if form.text.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.text.errors }}</div>
+                                </div>
+                                {% endif %}
+                                <label for="{{ form.text.id_for_label }}" class="col-md-2 col-form-label">Wish: </label>
+                                <div class="col-md-10">
+                                    {{ form.text }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                {% if form.url.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.url.errors }}</div>
+                                </div>
+                                {% endif %}
+                                <label for="{{ form.url.id_for_label }}" class="col-md-2 col-form-label">Wish Website Address: </label>
+                                <div class="col-md-10">
+                                    {{ form.url }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                {% if form.price.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.price.errors }}</div>
+                                </div>
+                                {% endif %}
+                                <label for="{{ form.price.id_for_label }}" class="col-md-2 col-form-label">Price: </label>
+                                <div class="col-md-10">
+                                    {{ form.price }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                {{ form.priority.errors }}
+                                <label for="{{ form.priority.id_for_label}}" class="col-md-2 col-form-label">{{ form.priority.label }}: </label>
+                                <div class="col-md-10">
+                                    <select name="{{ form.priority.label.lower }}" class="form-control">
+                                        {% for option in form.priority %}
+                                        {{ option.tag }}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                {% if form.notes.errors %}
+                                <div class="form-group has-error">
+                                    <div class="form-text">{{ form.notes.errors }}</div>
+                                </div>
+                                {% endif %}
+                                <label for="{{ form.notes.id_for_label }}" class="col-md-2 col-form-label">Wish Notes: </label>
+                                <div class="col-md-10">
+                                    {{ form.notes }}
+                                </div>
+                            </div>
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                        {% endblock %}

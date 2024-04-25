@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block header_text %}
+    {% if user.is_authenticated %}
+        {% if user.wishlist_set.all %}
+            Your lists
+        {% else %}
+            Start a new wishlist
+        {% endif %}
+    {% elif not user.is_authenticated %}
+        Register an account or login to create/modify wishlists
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+                        {% if user.is_authenticated %}
+                        <hr />
+                        <form method="POST" action="{% url 'new_list' %}">
+                            <p class="form-text">Start a new wishlist</p>
+                            {{ wishlist_form.title }}
+                            {% csrf_token %}
+                            {% if wishlist_form.errors %}
+                            <div class="form-group has-error">
+                                <div class="form-text">{{ wishlist_form.title.errors }}</div>
+                            </div>
+                            {% endif %}
+                        </form>
+                        <hr />
+                        <table class="table">
+                            {% for wishlist in user.wishlist_set.all %}
+                            <tr>
+                                <td><a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.uuid }}</a></td>
+                                <td><a class="btn btn-primary float-right " role="button" href="{% url 'edit_list' wishlist.uuid %}">Edit</a></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% endif %}
+{% endblock %}

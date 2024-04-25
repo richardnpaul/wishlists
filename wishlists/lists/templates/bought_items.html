@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block header_text %}Your item purchases{% endblock %}
+
+{% block table %}
+                <form method="post" action="{% url 'bought_items' %}">
+                    {% csrf_token %}
+                    <a href="{% url 'return_bought_items' %}" class="btn btn-primary btn-md float-right mb-2 ml-2" role="link">Return Purchase</a>
+                    <a href="{% url 'archive_bought_items' %}" class="btn btn-primary btn-md float-right mb-2" role="link">Archive Purchases</a>
+                    <table class="table table-hover table-responsive-md">
+                        <thead class="thead-light">
+                            <tr class="text-center">
+                                <th class="col-auto col-md-7" scope="col">Desired Item</th>
+                                <th class="col-auto col-md-1" scope="col">Price</th>
+                                <th class="col-auto col-md-1" scope="col">Ordered</th>
+                                <th class="col-auto col-md-1" scope="col">Delivered</th>
+                                <th class="col-auto col-md-1" scope="col">Wrapped</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ formset.management_form }}
+                            {% for form in formset %}
+                            <tr class="text-center">
+                                <td class="col-auto col-md-6" {% if form.notes %}data-toggle="tooltip" data-placement="right" title="{{ form.notes.value }}"{% endif %}>
+                                {% if form.url.value %}
+                                    <a href="{{ form.url.value }}">{{ form.text.value }} ({{ form.instance.wishlist.owner.first_name }})</a>
+                                {% else %}
+                                    {{ form.text.value }} ({{ form.instance.wishlist.owner.first_name }})
+                                {% endif %}
+                                    <span class="d-none">
+                                        {{ form.text }}{{ form.text.errors }}
+                                        {{ form.url }}{{ form.url.errors }}
+                                        {{ form.notes }}{{ form.notes.errors }}
+                                    </span>
+                                </td>
+                                <td class="col-auto col-md-1">{{ form.instance.price }}</td>
+                                <td class="col-auto col-md-1">{{ form.ordered }}</td>
+                                <td class="col-auto col-md-1">{{ form.delivered }}</td>
+                                <td class="col-auto col-md-1">{{ form.wrapped }}</td>
+                                {{ form.id }}{{ form.id.errors }}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary btn-md float-right" role="button">Change Item Status(es)</button>
+                </form>
+{% endblock %}

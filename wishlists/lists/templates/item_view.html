@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+                        {% block main %}
+                        <h2>
+                            {{ wishlist.owner.first_name }}'s wishlist:<br />
+                            <a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.title }}</a>
+                        </h2>
+                        {% endblock %}
+
+                        {% block table %}
+                        <a href="{% url 'view_list' wishlist.uuid %}" class="btn btn-primary btn-md float-left mb-2" role="link" >◄ Back to {{ wishlist.owner.first_name }}'s wishlist</a>
+                        <table class="table table-hover table-responsive-md">
+                            <thead class="thead-light">
+                                <tr class="text-center">
+                                    <th class="col-auto col-md-8" scope="col">Desired Item</th>
+                                    <th class="col-auto col-md-1" scope="col">Price</th>
+                                    {% if not user.is_authenticated%}
+                                    <th class="col-auto col-md-3" scope="col">Priority</th>
+                                    {% else %}
+                                    <th class="col-auto col-md-2" scope="col">Priority</th>
+                                    <th class="col-auto col-md-1" scope="col">Action</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center">
+                                    <td class="col-auto col-md-8" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                    <td class="col-auto col-md-1">{% if item.price %}{{ item.price }}{% endif %}</td>
+                                {% if not user.is_authenticated %}
+                                    <td class="col-auto col-md-3">{{ item.get_priority_display }}</td>
+                                {% else %}
+                                    <td class="col-auto col-md-2">{{ item.get_priority_display }}</td>
+                                    {% if user == wishlist.owner %}
+                                    <td class="col-auto col-md-1">
+                                        <form method="POST" action="{% url 'edit_list_item' item.uuid %}">
+                                            {% csrf_token %}
+                                            <input class="form-control btn btn-primary" type="submit" value="Edit" role="button" />
+                                        </form>
+                                    </td>
+                                    {% elif not item.gifter %}
+                                    <td class="col-auto col-md-1">
+                                        <form method="POST" action="{% url 'buy_list_item' item.uuid %}">
+                                                {% csrf_token %}
+                                                <input class="form-control btn btn-primary" type="submit" value="Buy" role="button" />
+                                        </form>
+                                    </td>
+                                    {% elif item.gifter.id == user.id %}
+                                    <td  class="col-auto col-md-1">
+                                        <form method="POST" action="{% url 'return_list_item' item.uuid %}">
+                                                {% csrf_token %}
+                                                <input class="form-control btn btn-danger" type="submit" value="Return" role="button" />
+                                        </form>
+                                    </td>
+                                    {% endif %}
+                                {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                        {% endblock %}

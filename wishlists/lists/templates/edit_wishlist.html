@@ -1,0 +1,28 @@
+{% extends 'base.form.html' %}
+
+{% block header_text %}{{ wishlist.title }}{% endblock %}
+
+{% block form_action %}{% url 'create_list_item' wishlist.uuid %}{% endblock %}
+
+{% block table %}
+                    <table class="table table-hover table-responsive-md">
+                        <thead class="thead-light">
+                            <tr class="text-center">
+                                <th class="col-auto col-md-7" scope="col">Desired Item(s)</th>
+                                <th class="col-auto col-md-1" scope="col">Price</th>
+                                <th class="col-auto col-md-2" scope="col">Priority</th>
+                                <th class="col-auto col-md-2" scope="col">View Item</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in wishlist.item_set.all %}
+                            <tr class="text-center">
+                                <td class="col-auto col-md-7" {% if item.notes %}data-toggle="tooltip" data-placement="right" title="{{ item.notes }}"{% endif %}>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</td>
+                                <td class="col-auto col-md-1">{% if item.price %}{{ item.price }}{% endif %}</td>
+                                <td class="col-auto col-md-2">{{ item.get_priority_display }}</td>
+                                <td class="col-auto col-md-1"><a href="{% url 'view_list_item' item.uuid %}" class="btn btn-primary" role="button">View</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+{% endblock %}

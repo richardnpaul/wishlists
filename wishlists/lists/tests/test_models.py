@@ -1,13 +1,12 @@
-# Django
-from django.test import TestCase
+# Django Imports
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 
 # Local
 from ..models import Item, Wishlist
 
 
 class ListAndItemModelTest(TestCase):
-
     def test_saving_and_retrieving_items(self):
         wishlist = Wishlist()
         wishlist.save()
@@ -37,12 +36,11 @@ class ListAndItemModelTest(TestCase):
 
     def test_cannot_save_empty_list_items(self):
         wishlist = Wishlist.objects.create()
-        item = Item(wishlist=wishlist, text='')
+        item = Item(wishlist=wishlist, text="")
         with self.assertRaises(ValidationError):
             item.save()
             item.full_clean()
 
     def test_get_absolute_url(self):
         wishlist = Wishlist.objects.create()
-        self.assertEqual(wishlist.get_absolute_url(),
-                         f'/wishlists/{wishlist.uuid}/')
+        self.assertEqual(wishlist.get_absolute_url(), f"/wishlists/{wishlist.uuid}/")

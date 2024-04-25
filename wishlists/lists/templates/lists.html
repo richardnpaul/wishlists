@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block header_text %}My wishlists{% endblock %}
+
+{% block main %}
+                        <form method="POST" action="{% url 'new_list' %}">
+                            {{ wishlist_form.title }}
+                            {% csrf_token %}
+                            {% if wishlist_form.errors %}
+                            <div class="form-group has-error">
+                                <div class="form-text">{{ wishlist_form.title.errors }}</div>
+                            </div>
+                            {% endif %}
+                            <input class="btn btn-primary align-center mt-3" role="button" type="submit" value="Create Wishlist" />
+                        </form>
+{% endblock %}
+
+{% block table %}
+
+                    <table class="table">
+                        {% for wishlist in lists %}
+                        <tr>
+                            <td>{% if wishlist.archived %}<del>{{ wishlist.title }}</del> - ARCHIVED{% else %}{{ wishlist.title }}{% endif %}</td>
+                            <td><a href="{% url 'view_list' wishlist.uuid %}" class="btn btn-primary float-right" role="button">View</a>
+                                {% if user == wishlist.owner %}
+                                <form method="POST" action="{% url 'archive_list' wishlist.uuid %}">
+                                    {% csrf_token %}
+                                    <input class="btn btn-danger float-right mr-2{% if wishlist.archived %} disabled{% endif %}" type="submit" value="Archive" role="button"{% if wishlist.archived %} disabled{% endif %} />
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+
+{% endblock %}

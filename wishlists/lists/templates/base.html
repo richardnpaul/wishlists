@@ -11,27 +11,99 @@
 
     </head>
     <body>
+        <!-- {% if messages %}<div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>{% endif %} -->
         <div class="container">
+            <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="/">Wishlists</a>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+                    {% block login_button %}
+                    {% if not user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
+                        <div class="dropdown-menu dropdown-menu-right" style="min-width:14.5rem;">
+                            <form class="dropdown-item" action="{% url 'account_login' %}?next={{ request.path|urlencode }}" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="{{ login_form.email.label }}">Email address</label>
+                                    {{ login_form.email }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ login_form.password.label }}">Password</label>
+                                    {{ login_form.password }}
+                                </div>
+                                <div class="form-check py-1">
+                                    <input name="remember_me" type="checkbox" class="form-check-input" id="dropdownCheck">
+                                    <label class="form-check-label" for="dropdownCheck">Remember me</label>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <button type="submit" class="m-0 col-12 form-row btn btn-primary text-center">Sign in</button>
+                            </form>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center col-12" href="{% url 'account_registration' %}">Click here to register</a>
+                            <!--<a class="dropdown-item" href="#">Click here to reset password</a> -->
+                            <div class="dropdown-divider"></div>
+                            <p class="w-100 text-center col-12">Or login with one of the providers below</p>
+                            <div class="social">
+                                <ul class="list-inline text-center">
+
+
+                                    <li class="google list-inline-item w-25 h-25">
+                                        <a href="{% url 'social:begin' 'google' %}">
+                                            <img class="w-100 h-100" src="https://developers.google.com/identity/images/g-logo.png" alt="Sign in with Google" />
+                                        </a>
+                                    </li>
+                                    <li class="facebook list-inline-item w-25 h-25">
+                                        <a href="{% url 'social:begin' 'facebook' %}">
+                                            <img class="w-100 h-100" src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Sign in with Facebook" />
+                                        </a>
+                                    </li>
+
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif user.is_authenticated %}
+                    <div class="nav-item">
+                        <a href="{% url 'view_users' %}" class="nav-link btn btn-primary btn-md m-1" role="button">View Users</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'view_my_lists' %}" class="nav-link btn btn-primary btn-md m-1" role="button">My Lists</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'bought_items' %}" class="nav-link btn btn-primary btn-md m-1" role="button">My Purchases</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link disabled w-100 text-center">{{ user.username }}</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link active w-100 text-center" href="{% url 'account_logout' %}">Logout</a>
+                    </div>
+                    {% endif %}
+                    {% endblock %}
+                </div>
+                <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon "></span>
+                </button>
+            </nav>
 
             <div class="row">
-                <div class="col-md-6 offset-3 jumbotron">
+                <div class="col-md-12 jumbotron">
                     <div class="text-center">
                         <h1>{% block header_text %}{% endblock %}</h1>
-                        <form method="POST" action="{% block form_action %}{% endblock %}">
-                            {{ form.text }}
-                            {% csrf_token %}
-                            {% if form.errors %}
-                            <div class="form-group has-error">
-                                <div class="form-text">{{ form.text.errors }}</div>
-                            </div>
-                            {% endif %}
-                        </form>
+                        {% block main %}
+                        {% endblock %}
                     </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-6 offset-3">
+                <div class="col-md-12">
                 {% block table %}
                 {% endblock %}
                 </div>
@@ -40,9 +112,17 @@
         </div>
 
         {% block javascript %}
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script>
+            jQuery(document.links).filter(function() {return this.hostname != window.location.hostname;}).attr('target', '_blank');
+            jQuery(function () {jQuery('[data-toggle="tooltip"]').tooltip()})
+        </script>
+
+        {% block customjs %}
+        {% endblock %}
+
         {% endblock %}
     </body>
 </html>
