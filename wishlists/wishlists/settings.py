@@ -12,17 +12,18 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 # Standard Library Imports
 import os
+from pathlib import Path
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "q7!5pjr-y@k(c&^hn^h)^i_-hze)s_q6c*l6*@h__!%s^y0v1n"
+SECRET_KEY = None
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,9 +44,9 @@ INSTALLED_APPS = [
     # 3rd party
     "social_django",
     # Local
+    "accounts",
     "functional_tests",
     "lists",
-    "accounts",
 ]
 
 MIDDLEWARE = [
