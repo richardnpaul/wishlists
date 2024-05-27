@@ -1,0 +1,9 @@
+services:
+  wishlists-django:
+    image: wishlists-django
+    build: .
+    command: python wishlists/manage.py runserver
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
