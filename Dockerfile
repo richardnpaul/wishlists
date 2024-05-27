@@ -57,5 +57,4 @@ RUN pip install --no-cache-dir -r /app/requirements/developer.txt
 
 WORKDIR /app/wishlists
 
-
 CMD ["/app/wishlists/manage.py", "runserver", "0.0.0.0:8000"]
