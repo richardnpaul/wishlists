@@ -1,4 +1,4 @@
-from . import *
+from wishlists.settings import *
 
 ALLOWED_HOSTS = ["*"]
 
