@@ -16,7 +16,9 @@ class NewVisitorTest(FunctionalTest):
         # Next, the visitor sees an input field into which they can enter text
         # The placeholder text tells them to enter a wishlist item
         inputbox = self.get_item_input_box()
-        self.assertEqual("Enter a wishlist item here", inputbox.get_attribute("placeholder"))
+        self.assertEqual(
+            "Enter a wishlist item here", inputbox.get_attribute("placeholder")
+        )
 
         # They type in a desired item.
         inputbox.send_keys("Christmas wish no.1")
@@ -24,7 +26,9 @@ class NewVisitorTest(FunctionalTest):
         # On pressing enter, the item is added to the page and a new empty
         # input box appears
         inputbox.send_keys(Keys.ENTER)
-        self.assertEqual("Enter a wishlist item here", inputbox.get_attribute("placeholder"))
+        self.assertEqual(
+            "Enter a wishlist item here", inputbox.get_attribute("placeholder")
+        )
         self.wait_for_row_in_list_table("Christmas wish no.1")
 
         inputbox = self.get_item_input_box()

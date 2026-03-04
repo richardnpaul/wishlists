@@ -34,7 +34,11 @@ def account_login(request):
 
             if user is not None:
                 if user.is_active:
-                    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                    login(
+                        request,
+                        user,
+                        backend="django.contrib.auth.backends.ModelBackend",
+                    )
                     return HttpResponseRedirect(next_url)
     else:
         login_form = LoginForm()
@@ -45,7 +49,6 @@ def account_registration(request):
     if request.POST:
         registration_form = RegistrationForm(request.POST)
         if registration_form.is_valid():
-
             user = registration_form.save(commit=False)
             user.is_active = False
             user.save()
@@ -67,7 +70,13 @@ def account_registration(request):
             Please check your email account for your {current_site.domain}
             account confirmation email"""
             return render(
-                request, "home.html", {"messages": check_mail_msg, "form": ItemForm(), "login_form": LoginForm()}
+                request,
+                "home.html",
+                {
+                    "messages": check_mail_msg,
+                    "form": ItemForm(),
+                    "login_form": LoginForm(),
+                },
             )
 
     else:
