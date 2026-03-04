@@ -1,0 +1,36 @@
+{
+    "image": "wishlists-django:latest",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "streetsidesoftware.code-spell-checker",
+                "EditorConfig.EditorConfig",
+                "dbaeumer.vscode-eslint",
+                "tamasfe.even-better-toml",
+                "github.vscode-github-actions",
+                "GitHub.copilot-chat",
+                "codezombiech.gitignore",
+                "eamodio.gitlens",
+                "ms-python.isort",
+                "Tim-Koehler.helm-intellisense",
+                "richie5um2.vscode-statusbar-json-path",
+                "ms-kubernetes-tools.vscode-kubernetes-tools",
+                "fnando.linter",
+                "ms-vscode.makefile-tools",
+                "yzhang.markdown-all-in-one",
+                "shd101wyy.markdown-preview-enhanced",
+                "esbenp.prettier-vscode",
+                "ms-python.debugpy",
+                "ms-python.vscode-python-envs",
+                "Thinker.sort-json",
+                "ms-vscode.sublime-keybindings",
+                "be5invis.toml",
+                "redhat.vscode-yaml",
+                "elagil.pre-commit-helper"
+            ]
+        }
+    }
+}
