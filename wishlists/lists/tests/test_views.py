@@ -2,9 +2,10 @@
 from django.test import TestCase
 from django.utils.html import escape
 
-from ..forms import EMPTY_ITEM_ERROR, ItemForm
+from lists.forms import EMPTY_ITEM_ERROR, ItemForm
+
 # Local
-from ..models import Item, Wishlist
+from lists.models import Item, Wishlist
 
 
 class HomePageTest(TestCase):
@@ -25,7 +26,9 @@ class NewListTest(TestCase):
         self.assertEqual(new_item.text, "Item for List no.1")
 
     def test_redirects_after_post(self):
-        response = self.client.post("/wishlists/new/", data={"text": "Item for List no.1"})
+        response = self.client.post(
+            "/wishlists/new/", data={"text": "Item for List no.1"}
+        )
         new_wishlist = Wishlist.objects.first()
         self.assertRedirects(response, f"/wishlists/{new_wishlist.uuid}/")
 
@@ -55,8 +58,12 @@ class ListViewTest(TestCase):
         Item.objects.create(text="Christmas wish no.2", wishlist=correct_wishlist)
 
         other_wishlist = Wishlist.objects.create()
-        Item.objects.create(text="Other Christmas wishlist item no.1", wishlist=other_wishlist)
-        Item.objects.create(text="Other Christmas wishlist item no.2", wishlist=other_wishlist)
+        Item.objects.create(
+            text="Other Christmas wishlist item no.1", wishlist=other_wishlist
+        )
+        Item.objects.create(
+            text="Other Christmas wishlist item no.2", wishlist=other_wishlist
+        )
 
         response = self.client.get(f"/wishlists/{correct_wishlist.uuid}/")
 
@@ -71,7 +78,7 @@ class ListViewTest(TestCase):
         self.assertTemplateUsed(response, "wishlist.html")
 
     def test_passes_correct_wishlist_to_template(self):
-        other_wishlist = Wishlist.objects.create()
+        Wishlist.objects.create()
         correct_wishlist = Wishlist.objects.create()
         response = self.client.get(f"/wishlists/{correct_wishlist.uuid}/")
         self.assertEqual(response.context["wishlist"], correct_wishlist)
@@ -83,9 +90,12 @@ class ListViewTest(TestCase):
         self.assertContains(response, 'name="text"')
 
     def test_can_save_a_post_request_to_an_existing_wishlist(self):
-        other_wishlist = Wishlist.objects.create()
+        Wishlist.objects.create()
         correct_wishlist = Wishlist.objects.create()
-        self.client.post(f"/wishlists/{correct_wishlist.uuid}/", data={"text": "New item for existing wishlist"})
+        self.client.post(
+            f"/wishlists/{correct_wishlist.uuid}/",
+            data={"text": "New item for existing wishlist"},
+        )
 
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.first()

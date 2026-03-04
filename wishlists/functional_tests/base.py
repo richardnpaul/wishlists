@@ -7,7 +7,6 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 # Third-party Imports
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.common.keys import Keys
 
 
 MAX_WAIT = 10

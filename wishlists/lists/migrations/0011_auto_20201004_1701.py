@@ -4,18 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('lists', '0010_auto_20191017_1720'),
+        ("lists", "0010_auto_20191017_1720"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='item',
+            name="item",
             unique_together=set(),
         ),
         migrations.AddConstraint(
-            model_name='item',
-            constraint=models.UniqueConstraint(fields=('text', 'wishlist'), name='Unique wishlist items'),
+            model_name="item",
+            constraint=models.UniqueConstraint(
+                fields=("text", "wishlist"), name="Unique wishlist items"
+            ),
         ),
     ]
