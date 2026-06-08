@@ -1,4 +1,4 @@
-from wishlists.settings import *
+from wishlists.settings import *  # noqa: F403
 
 ALLOWED_HOSTS = ["*"]
 
