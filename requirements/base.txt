@@ -17,7 +17,7 @@ requests==2.33.0
 requests-oauthlib==2.0.0
 six==1.17.0
 social-auth-app-django==5.7.0
-social-auth-core==4.8.5
+social-auth-core==5.0.0
 sqlparse==0.6.0
 typing-extensions==4.15.0
 urllib3==2.7.0
