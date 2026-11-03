@@ -1,0 +1,32 @@
+# Compose file used by the devcontainer only. It is deliberately separate from the
+# repo-root docker-compose.yml so that it publishes no host ports (VS Code forwards
+# them instead) and can't clash with a stack started from the root file.
+services:
+  wishlists-django:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: development
+    # The editor attaches to this container; run the server by hand or from a task.
+    command: sleep infinity
+    environment:
+      DJANGO_SETTINGS_MODULE: wishlists.settings.devcontainer
+    volumes:
+      - ..:/workspaces/wishlists:cached
+    working_dir: /workspaces/wishlists/wishlists
+    depends_on:
+      - db
+
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wishlists
+      POSTGRES_USER: wishlists
+      POSTGRES_PASSWORD: wishlists
+    volumes:
+      # Postgres 18+ images keep data in a version-specific subdirectory of this path.
+      - db-data:/var/lib/postgresql
+
+volumes:
+  db-data:
