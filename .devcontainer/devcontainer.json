@@ -5,9 +5,13 @@
   "workspaceFolder": "/workspaces/wishlists",
   "shutdownAction": "stopCompose",
   "remoteUser": "wishlists",
-  "forwardPorts": [8000],
+  "forwardPorts": [
+    8000
+  ],
   "portsAttributes": {
-    "8000": { "label": "Django runserver" }
+    "8000": {
+      "label": "Django runserver"
+    }
   },
   "postCreateCommand": "python wishlists/manage.py migrate --noinput",
   "customizations": {
@@ -15,8 +19,24 @@
       "extensions": [
         "anthropic.claude-code",
         "batisteo.vscode-django",
+        "be5invis.toml",
         "charliermarsh.ruff",
-        "ms-python.python"
+        "codezombiech.gitignore",
+        "dbaeumer.vscode-eslint",
+        "eamodio.gitlens",
+        "elagil.pre-commit-helper",
+        "esbenp.prettier-vscode",
+        "fnando.linter",
+        "github.vscode-github-actions",
+        "ms-python.debugpy",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.vscode-python-envs",
+        "ms-vscode.makefile-tools",
+        "ms-vscode.sublime-keybindings",
+        "streetsidesoftware.code-spell-checker",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/venv/bin/python",

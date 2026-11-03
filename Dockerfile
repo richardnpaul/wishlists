@@ -33,13 +33,14 @@ RUN pip install --no-cache-dir -r /app/requirements/production.txt
 CMD ["uwsgi", "--ini", "uwsgi.ini"]
 
 
-FROM python:3.14-bookworm AS development
+FROM python:3.14-bookworm AS dev
 
 RUN wget -qO /usr/bin/uwsgitop https://raw.githubusercontent.com/xrmx/uwsgitop/refs/heads/master/uwsgitop \
     && chmod +x /usr/bin/uwsgitop
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev postgresql-client \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpq-dev postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home --shell /bin/bash --home-dir /home/wishlists wishlists
