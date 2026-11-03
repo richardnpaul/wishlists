@@ -6,7 +6,7 @@ services:
       target: dev
     command: ./entrypoint.sh compose
     ports:
-      - 8000:8000
+      - 8008:8000
     volumes:
       - ./:/app
     working_dir: /app
