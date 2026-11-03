@@ -99,3 +99,65 @@ class ListViewTest(TestCase):
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, "New item for existing wishlist")
         self.assertEqual(new_item.wishlist, correct_wishlist)
+
+
+class AuthorizationTest(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username="owner", password="password")
+        self.attacker = User.objects.create_user(username="attacker", password="password")
+        self.wishlist = Wishlist.objects.create(owner=self.owner, title="Owner's Wishlist")
+        self.item = Item.objects.create(text="Owner Item", wishlist=self.wishlist)
+
+    def test_user_cannot_create_item_on_others_wishlist(self):
+        self.client.force_login(self.attacker)
+        response = self.client.post(
+            f"/wishlists/{self.wishlist.uuid}/item/create/",
+            data={"text": "Malicious Item"},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Item.objects.filter(text="Malicious Item").count(), 0)
+
+    def test_user_cannot_edit_others_wishlist(self):
+        self.client.force_login(self.attacker)
+        response = self.client.get(f"/wishlists/{self.wishlist.uuid}/edit/")
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_cannot_edit_others_item(self):
+        self.client.force_login(self.attacker)
+        response = self.client.get(f"/wishlists/item/{self.item.uuid}/edit/")
+        self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            f"/wishlists/item/{self.item.uuid}/edit/",
+            data={"text": "Hacked Item"},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.text, "Owner Item")
+
+    def test_user_cannot_save_others_item(self):
+        self.client.force_login(self.attacker)
+        response = self.client.post(
+            f"/wishlists/item/{self.item.uuid}/save/",
+            data={"text": "Hacked Item"},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.text, "Owner Item")
+
+    def test_user_cannot_archive_others_wishlist(self):
+        self.client.force_login(self.attacker)
+        response = self.client.post(f"/wishlists/{self.wishlist.uuid}/archive/")
+        self.assertEqual(response.status_code, 403)
+        self.wishlist.refresh_from_db()
+        self.assertFalse(self.wishlist.archived)
+
+    def test_owner_can_edit_own_item(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(
+            f"/wishlists/item/{self.item.uuid}/edit/",
+            data={"text": "Updated Item", "priority": "2"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.text, "Updated Item")
+        self.assertEqual(self.item.priority, "2")

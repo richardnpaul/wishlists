@@ -1,3 +1,5 @@
+import os
+
 from . import *  # noqa: F403
 
 
@@ -9,11 +11,11 @@ SECRET_KEY = "kb^p-0d0l6n^^mx%y&neud90kl+tom9+#97y)cg%4=+-cz(^k_"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "wishlists",
-        "USER": "wishlists",
-        "PASSWORD": "wishlists",
-        "HOST": "db",
-        "PORT": "5432",
+        "NAME": os.environ.get("POSTGRES_DB", "wishlists"),
+        "USER": os.environ.get("POSTGRES_USER", "wishlists"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "wishlists"),
+        "HOST": os.environ.get("POSTGRES_HOST", "db"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
     }
 }
 

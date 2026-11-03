@@ -6,7 +6,7 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
-      target: development
+      target: dev
     # The editor attaches to this container; run the server by hand or from a task.
     command: sleep infinity
     environment:

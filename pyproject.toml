@@ -32,7 +32,7 @@ where = ["wishlists"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py314"
+target-version = "py315"
 force-exclude = true
 extend-exclude = [
     "**/migrations/*",

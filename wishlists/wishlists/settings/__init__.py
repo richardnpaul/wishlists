@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = None
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-default-change-in-production")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -144,7 +144,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # EMAIL_HOST_PASSWORD = 'youremailpassword'
 # EMAIL_PORT = 587
 
-# Security Header settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Security Header settings (enabled via environment in production)
+SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False").lower() in ("true", "1")
+SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "False").lower() in ("true", "1")
+CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "False").lower() in ("true", "1")
