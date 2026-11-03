@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wishlists"
+version = "0.1.0"
+description = "A wishlist web application built with Django"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "argon2-cffi>=25.1.0",
+    "Django>=6.1.3",
+    "django-ses>=4.9.0",
+    "psycopg>=3.3.7",
+    "social-auth-app-django>=7.2.0",
+    "social-auth-core>=6.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=4.0.0",
+    "ruff>=0.17.3",
+    "selenium>=4.52.0",
+]
+production = [
+    "uWSGI>=2.0.31",
+]
+
+[tool.setuptools.packages.find]
+where = ["wishlists"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+force-exclude = true
+extend-exclude = [
+    "**/migrations/*",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+]
+ignore = [
+    "F403", # 'from module import *' used; unable to detect undefined names
+    "F405", # name may be undefined, or defined from star imports
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/manage.py" = ["I001"]
+"**/wsgi.py" = ["I001"]
+"**/settings/compose.py" = ["F401", "F403"]
+"**/settings/devcontainer.py" = ["F401", "F403"]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+lines-between-types = 1
+known-first-party = ["accounts", "lists", "wishlists", "functional_tests"]
+section-order = [
+    "future",
+    "standard-library",
+    "django",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.lint.isort.sections]
+django = ["django"]

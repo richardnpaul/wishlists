@@ -13,9 +13,9 @@ WORKDIR /app
 
 ENV PATH="/venv/bin:$PATH"
 
-COPY --chown=wishlists:wishlists requirements/ /app/requirements/
+COPY --chown=wishlists:wishlists pyproject.toml README.md /app/
 
-RUN pip install --no-cache-dir -r requirements/base.txt
+RUN pip install --no-cache-dir .
 
 
 FROM python:3.15-slim AS production
@@ -28,7 +28,7 @@ COPY --chown=wishlists:wishlists --from=build_base /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 COPY --chown=wishlists:wishlists . /app
-RUN pip install --no-cache-dir -r /app/requirements/production.txt
+RUN pip install --no-cache-dir ".[production]"
 
 CMD ["uwsgi", "--ini", "uwsgi.ini"]
 
@@ -51,10 +51,10 @@ COPY --chown=wishlists:wishlists --from=build_base /static /static
 COPY --chown=wishlists:wishlists --from=build_base /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
-COPY --chown=wishlists:wishlists ./requirements/ /app/requirements/
+COPY --chown=wishlists:wishlists pyproject.toml README.md /app/
 
 USER wishlists
-RUN pip install --no-cache-dir -r /app/requirements/developer.txt
+RUN pip install --no-cache-dir ".[dev]"
 
 WORKDIR /app/wishlists
 

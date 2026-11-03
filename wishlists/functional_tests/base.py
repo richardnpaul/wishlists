@@ -28,10 +28,16 @@ def wait(fn):
 
 class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        try:
+            options = webdriver.FirefoxOptions()
+            options.add_argument("-headless")
+            self.browser = webdriver.Firefox(options=options)
+        except Exception as e:
+            self.skipTest(f"Browser not available: {e}")
 
     def tearDown(self):
-        self.browser.quit()
+        if hasattr(self, "browser"):
+            self.browser.quit()
 
     @wait
     def wait_for(self, fn):

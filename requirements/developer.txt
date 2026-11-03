@@ -1,8 +1,0 @@
--r base.txt
-
-black
-flake8
-isort
-mccabe
-pycodestyle
-pyflakes

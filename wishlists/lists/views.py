@@ -25,9 +25,7 @@ def home_page(request):
 @require_safe
 def view_list(request, wishlist_uuid):
     wishlist = Wishlist.objects.get(uuid=wishlist_uuid)
-    return render(
-        request, "wishlist.html", {"wishlist": wishlist, "login_form": LoginForm()}
-    )
+    return render(request, "wishlist.html", {"wishlist": wishlist, "login_form": LoginForm()})
 
 
 @login_required
@@ -65,9 +63,7 @@ def view_users_lists(request, user_id):
 @login_required
 @require_safe
 def view_users(request):
-    users = User.objects.filter(
-        is_active=True, is_superuser=False, is_staff=False
-    ).all()
+    users = User.objects.filter(is_active=True, is_superuser=False, is_staff=False).all()
     wishlists = Wishlist.objects.all()
     return render(
         request,
@@ -184,11 +180,7 @@ def archive_bought_items(request):
 
 @login_required
 def view_all_bought_items(request):
-    item_qs = (
-        Item.objects.filter(gifter=request.user, archived=False)
-        .order_by("wishlist")
-        .all()
-    )
+    item_qs = Item.objects.filter(gifter=request.user, archived=False).order_by("wishlist").all()
 
     BoughtItemFormSet = modelformset_factory(
         Item,
@@ -212,22 +204,14 @@ def view_all_bought_items(request):
                 {"formset": formset, "login_form": LoginForm()},
             )
 
-    return render(
-        request, "bought_items.html", {"formset": formset, "login_form": LoginForm()}
-    )
+    return render(request, "bought_items.html", {"formset": formset, "login_form": LoginForm()})
 
 
 @login_required
 @require_safe
 def return_bought_items(request):
-    items = (
-        Item.objects.filter(gifter=request.user, archived=False)
-        .order_by("wishlist")
-        .all()
-    )
-    return render(
-        request, "return_bought_items.html", {"items": items, "login_form": LoginForm()}
-    )
+    items = Item.objects.filter(gifter=request.user, archived=False).order_by("wishlist").all()
+    return render(request, "return_bought_items.html", {"items": items, "login_form": LoginForm()})
 
 
 @login_required
