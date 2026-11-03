@@ -1,4 +1,4 @@
-FROM python:3.14-bookworm AS build_base
+FROM python:3.15 AS build_base
 
 RUN mkdir -m 0755 -p /venv /static
 RUN python -m venv /venv
@@ -18,7 +18,7 @@ COPY --chown=wishlists:wishlists requirements/ /app/requirements/
 RUN pip install --no-cache-dir -r requirements/base.txt
 
 
-FROM python:3.14-slim-bookworm AS production
+FROM python:3.15-slim AS production
 
 RUN useradd --create-home --shell /bin/bash --home-dir /app wishlists
 USER wishlists
@@ -33,7 +33,7 @@ RUN pip install --no-cache-dir -r /app/requirements/production.txt
 CMD ["uwsgi", "--ini", "uwsgi.ini"]
 
 
-FROM python:3.14-bookworm AS dev
+FROM python:3.15 AS dev
 
 RUN wget -qO /usr/bin/uwsgitop https://raw.githubusercontent.com/xrmx/uwsgitop/refs/heads/master/uwsgitop \
     && chmod +x /usr/bin/uwsgitop

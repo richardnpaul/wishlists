@@ -1,7 +1,9 @@
 services:
   django:
-    image: django
-    build: .
+    image: django:dev
+    build:
+      context: .
+      target: dev
     command: ./entrypoint.sh compose
     ports:
       - 8000:8000

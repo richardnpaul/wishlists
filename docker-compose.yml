@@ -1,7 +1,9 @@
 services:
   django:
     image: django
-    build: .
+    build:
+      context: .
+      target: production
     command: ./entrypoint.sh local
     ports:
       - 8000:8000
