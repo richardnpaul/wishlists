@@ -51,7 +51,7 @@ COPY --chown=wishlists:wishlists --from=build_base /static /static
 COPY --chown=wishlists:wishlists --from=build_base /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
-COPY --chown=wishlists:wishlists pyproject.toml README.md /app/
+COPY --chown=wishlists:wishlists pyproject.toml /app/
 
 USER wishlists
 RUN pip install --no-cache-dir ".[dev]"
