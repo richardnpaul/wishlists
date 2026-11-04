@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Q
 from django.forms.models import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST, require_safe
@@ -10,8 +11,8 @@ from django.views.decorators.http import require_POST, require_safe
 from accounts.forms import LoginForm
 
 # Local
-from .forms import ArchiveItemForm, BoughtItemForm, ItemForm, WishListForm
-from .models import Item, Wishlist
+from .forms import ArchiveItemForm, BoughtItemForm, GroupForm, ItemForm, WishListForm, WishlistPrivacyForm
+from .models import Group, Item, Wishlist, can_view_wishlist
 
 
 @require_safe
@@ -26,6 +27,8 @@ def home_page(request):
 @require_safe
 def view_list(request, wishlist_uuid):
     wishlist = get_object_or_404(Wishlist, uuid=wishlist_uuid)
+    if not can_view_wishlist(request.user, wishlist):
+        raise PermissionDenied
     return render(request, "wishlist.html", {"wishlist": wishlist, "login_form": LoginForm()})
 
 
@@ -55,8 +58,13 @@ def view_my_lists(request):
 @login_required
 @require_safe
 def view_users_lists(request, user_id):
-    lists = Wishlist.objects.filter(owner=user_id, archived=False).all()
-    return render(request, "lists.html", {"lists": lists, "login_form": LoginForm()})
+    all_lists = Wishlist.objects.filter(owner=user_id, archived=False).all()
+    lists = [w for w in all_lists if can_view_wishlist(request.user, w)]
+    return render(
+        request,
+        "lists.html",
+        {"lists": lists, "wishlist_form": WishListForm(), "login_form": LoginForm()},
+    )
 
 
 @login_required
@@ -75,6 +83,8 @@ def view_users(request):
 def view_list_item(request, item_uuid):
     item = get_object_or_404(Item, uuid=item_uuid)
     wishlist = item.wishlist
+    if not can_view_wishlist(request.user, wishlist):
+        raise PermissionDenied
     return render(
         request,
         "item_view.html",
@@ -125,6 +135,8 @@ def save_list_item(request, item_uuid):
 def buy_list_item(request, item_uuid):
     item = get_object_or_404(Item, uuid=item_uuid)
     wishlist = item.wishlist
+    if not can_view_wishlist(request.user, wishlist):
+        raise PermissionDenied
     if not item.gifter and request.user != wishlist.owner:
         item.gifter = request.user
         item.save()
@@ -273,4 +285,113 @@ def create_list_item(request, wishlist_uuid):
         "edit_wishlist.html",
         {"wishlist": wishlist, "form": form, "login_form": LoginForm()},
         status=400,
+    )
+
+
+@login_required
+@require_safe
+def group_list(request):
+    query = request.GET.get("q", "").strip()
+    groups_qs = Group.objects.annotate(member_count=Count("members")).order_by("name")
+    if query:
+        groups_qs = groups_qs.filter(Q(name__icontains=query) | Q(description__icontains=query))
+    user_group_ids = set(request.user.subscribed_groups.values_list("id", flat=True))
+    return render(
+        request,
+        "group_list.html",
+        {
+            "groups": groups_qs,
+            "query": query,
+            "user_group_ids": user_group_ids,
+            "login_form": LoginForm(),
+        },
+    )
+
+
+@login_required
+def group_create(request):
+    if request.method == "POST":
+        form = GroupForm(data=request.POST)
+        if form.is_valid():
+            group = form.save(commit=False)
+            group.creator = request.user
+            group.save()
+            group.members.add(request.user)
+            return redirect("group_detail", group_uuid=group.uuid)
+        return render(
+            request,
+            "group_create.html",
+            {"form": form, "login_form": LoginForm()},
+            status=400,
+        )
+    return render(
+        request,
+        "group_create.html",
+        {"form": GroupForm(), "login_form": LoginForm()},
+    )
+
+
+@login_required
+@require_safe
+def group_detail(request, group_uuid):
+    group = get_object_or_404(Group, uuid=group_uuid)
+    is_member = group.members.filter(id=request.user.id).exists()
+    all_shared = group.wishlists.filter(archived=False).all()
+    shared_wishlists = [w for w in all_shared if can_view_wishlist(request.user, w)]
+    user_wishlists = Wishlist.objects.filter(owner=request.user, archived=False).all()
+    return render(
+        request,
+        "group_detail.html",
+        {
+            "group": group,
+            "is_member": is_member,
+            "shared_wishlists": shared_wishlists,
+            "user_wishlists": user_wishlists,
+            "login_form": LoginForm(),
+        },
+    )
+
+
+@login_required
+@require_POST
+def group_subscribe(request, group_uuid):
+    group = get_object_or_404(Group, uuid=group_uuid)
+    group.members.add(request.user)
+    next_url = request.POST.get("next")
+    if next_url and next_url.startswith("/"):
+        return redirect(next_url)
+    return redirect("group_detail", group_uuid=group.uuid)
+
+
+@login_required
+@require_POST
+def group_unsubscribe(request, group_uuid):
+    group = get_object_or_404(Group, uuid=group_uuid)
+    group.members.remove(request.user)
+    next_url = request.POST.get("next")
+    if next_url and next_url.startswith("/"):
+        return redirect(next_url)
+    return redirect("group_detail", group_uuid=group.uuid)
+
+
+@login_required
+def edit_wishlist_privacy(request, wishlist_uuid):
+    wishlist = get_object_or_404(Wishlist, uuid=wishlist_uuid)
+    if wishlist.owner != request.user:
+        raise PermissionDenied
+    if request.method == "POST":
+        form = WishlistPrivacyForm(data=request.POST, instance=wishlist, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("view_list", wishlist_uuid=wishlist.uuid)
+    else:
+        form = WishlistPrivacyForm(instance=wishlist, user=request.user)
+    return render(
+        request,
+        "edit_wishlist_privacy.html",
+        {
+            "wishlist": wishlist,
+            "privacy_form": form,
+            "login_form": LoginForm(),
+        },
     )

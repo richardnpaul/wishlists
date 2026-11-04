@@ -3,8 +3,16 @@
 {% block header_text %}{{ wishlist.title }}{% endblock %}
 
 {% block main %}
+                    <div class="mb-2">
+                        {% if wishlist.is_private %}
+                        <span class="badge badge-secondary">Private</span>
+                        {% else %}
+                        <span class="badge badge-info">Public</span>
+                        {% endif %}
+                    </div>
                     {% if user.is_authenticated and user == wishlist.owner %}
-                    <a class="btn btn-primary float-right " role="button" href="{% url 'edit_list' wishlist.uuid %}">Edit</a>
+                    <a class="btn btn-outline-info float-right ml-2" role="button" href="{% url 'edit_wishlist_privacy' wishlist.uuid %}">Privacy & Sharing</a>
+                    <a class="btn btn-primary float-right" role="button" href="{% url 'edit_list' wishlist.uuid %}">Edit</a>
                     {% endif %}
 {% endblock %}
 

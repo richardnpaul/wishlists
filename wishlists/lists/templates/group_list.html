@@ -1,0 +1,75 @@
+{% extends 'lists.base.html' %}
+
+{% block title %}
+<title>Groups - Wishlists</title>
+{% endblock %}
+
+{% block header_text %}Groups{% endblock %}
+
+{% block main %}
+<div class="container my-3">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <form method="GET" action="{% url 'group_list' %}" class="form-inline">
+                <div class="input-group w-100">
+                    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search groups by name or description..." />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4 text-md-right mt-3 mt-md-0">
+            <a href="{% url 'group_create' %}" class="btn btn-success" role="button">Create New Group</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block table %}
+<div class="container">
+    {% if groups %}
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col" class="col-4">Group Name</th>
+                <th scope="col" class="col-4">Description</th>
+                <th scope="col" class="col-2 text-center">Members</th>
+                <th scope="col" class="col-2 text-center">Membership Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+            <tr>
+                <td>
+                    <a href="{% url 'group_detail' group.uuid %}" class="font-weight-bold">{{ group.name }}</a>
+                </td>
+                <td>{{ group.description|default:"No description provided." }}</td>
+                <td class="text-center">{{ group.member_count }}</td>
+                <td class="text-center">
+                    {% if group.id in user_group_ids %}
+                    <span class="badge badge-success mb-1">Subscribed</span>
+                    <form method="POST" action="{% url 'group_unsubscribe' group.uuid %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'group_list' %}" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm ml-1">Unsubscribe</button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{% url 'group_subscribe' group.uuid %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'group_list' %}" />
+                        <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info text-center" role="alert">
+        No groups found. <a href="{% url 'group_create' %}" class="alert-link">Create a new group</a> to get started!
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
