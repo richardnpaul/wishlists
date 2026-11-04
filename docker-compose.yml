@@ -1,20 +1,12 @@
 services:
-  wishlists-django:
-    image: wishlists-django
-    build: .
-    command: ./entrypoint.sh compose
+  django:
+    image: django
+    build:
+      context: .
+      target: production
+    command: ./entrypoint.sh local
     ports:
       - 8000:8000
     volumes:
       - ./:/app
     working_dir: /app
-    depends_on:
-      - db
-  db:
-    image: postgres:18
-    environment:
-      - POSTGRES_DB=wishlists
-      - POSTGRES_USER=wishlists
-      - POSTGRES_PASSWORD=wishlists
-    ports:
-      - 5432:5432

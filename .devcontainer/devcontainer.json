@@ -1,40 +1,56 @@
 {
-    "build": {
-        "dockerfile": "../Dockerfile",
-        "context": "..",
-        "target": "development"
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-python.black-formatter",
-                "streetsidesoftware.code-spell-checker",
-                "EditorConfig.EditorConfig",
-                "dbaeumer.vscode-eslint",
-                "tamasfe.even-better-toml",
-                "github.vscode-github-actions",
-                "GitHub.copilot-chat",
-                "codezombiech.gitignore",
-                "eamodio.gitlens",
-                "ms-python.isort",
-                "Tim-Koehler.helm-intellisense",
-                "richie5um2.vscode-statusbar-json-path",
-                "ms-kubernetes-tools.vscode-kubernetes-tools",
-                "fnando.linter",
-                "ms-vscode.makefile-tools",
-                "yzhang.markdown-all-in-one",
-                "shd101wyy.markdown-preview-enhanced",
-                "esbenp.prettier-vscode",
-                "ms-python.debugpy",
-                "ms-python.vscode-python-envs",
-                "Thinker.sort-json",
-                "ms-vscode.sublime-keybindings",
-                "be5invis.toml",
-                "redhat.vscode-yaml",
-                "elagil.pre-commit-helper"
-            ]
-        }
+  "name": "wishlists",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "wishlists-django",
+  "workspaceFolder": "/workspaces/wishlists",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "wishlists",
+  "forwardPorts": [
+    8000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "Django runserver"
     }
+  },
+  "postCreateCommand": "python wishlists/manage.py migrate --noinput",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "batisteo.vscode-django",
+        "be5invis.toml",
+        "charliermarsh.ruff",
+        "codezombiech.gitignore",
+        "dbaeumer.vscode-eslint",
+        "eamodio.gitlens",
+        "elagil.pre-commit-helper",
+        "esbenp.prettier-vscode",
+        "fnando.linter",
+        "github.vscode-github-actions",
+        "ms-python.debugpy",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.vscode-python-envs",
+        "ms-vscode.makefile-tools",
+        "ms-vscode.sublime-keybindings",
+        "streetsidesoftware.code-spell-checker",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/venv/bin/python",
+        "python.terminal.activateEnvironment": false,
+        "[python]": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+          }
+        },
+        "ruff.lineLength": 120
+      }
+    }
+  }
 }

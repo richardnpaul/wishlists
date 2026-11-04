@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
 # Local
-from accounts import views
+from . import views
 
 
 urlpatterns = [
@@ -11,9 +11,7 @@ urlpatterns = [
     path("logout/", views.account_logout, name="account_logout"),
     path("register/", views.account_registration, name="account_registration"),
     path("activate/<str:uidb64>/<str:token>/", views.activate, name="activate"),
-    path(
-        "password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"
-    ),
+    path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
     path(
         "password_reset/done/",
         auth_views.PasswordResetView.as_view(),

@@ -9,12 +9,8 @@ class LoginForm(forms.ModelForm):
         model = User
         fields = ("email", "password")
         widgets = {
-            "email": forms.EmailInput(
-                attrs={"placeholder": "Enter email address", "class": "form-control"}
-            ),
-            "password": forms.PasswordInput(
-                attrs={"placeholder": "Enter password", "class": "form-control"}
-            ),
+            "email": forms.EmailInput(attrs={"placeholder": "Enter email address", "class": "form-control"}),
+            "password": forms.PasswordInput(attrs={"placeholder": "Enter password", "class": "form-control"}),
         }
 
 
@@ -30,18 +26,10 @@ class RegistrationForm(UserCreationForm):
             "password2",
         )
         widgets = {
-            "first_name": forms.TextInput(
-                attrs={"placeholder": "Enter your first name", "class": "form-control"}
-            ),
-            "last_name": forms.TextInput(
-                attrs={"placeholder": "Enter your last name", "class": "form-control"}
-            ),
-            "username": forms.EmailInput(
-                attrs={"placeholder": "Enter email address", "class": "form-control"}
-            ),
-            "password1": forms.PasswordInput(
-                attrs={"placeholder": "Enter your password", "class": "form-control"}
-            ),
+            "first_name": forms.TextInput(attrs={"placeholder": "Enter your first name", "class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"placeholder": "Enter your last name", "class": "form-control"}),
+            "username": forms.EmailInput(attrs={"placeholder": "Enter email address", "class": "form-control"}),
+            "password1": forms.PasswordInput(attrs={"placeholder": "Enter your password", "class": "form-control"}),
             "password2": forms.PasswordInput(
                 attrs={
                     "placeholder": "Enter the same password again",

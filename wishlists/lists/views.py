@@ -1,6 +1,7 @@
 # Django Imports
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.forms.models import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST, require_safe
@@ -24,23 +25,19 @@ def home_page(request):
 
 @require_safe
 def view_list(request, wishlist_uuid):
-    wishlist = Wishlist.objects.get(uuid=wishlist_uuid)
-    return render(
-        request, "wishlist.html", {"wishlist": wishlist, "login_form": LoginForm()}
-    )
+    wishlist = get_object_or_404(Wishlist, uuid=wishlist_uuid)
+    return render(request, "wishlist.html", {"wishlist": wishlist, "login_form": LoginForm()})
 
 
 @login_required
 @require_POST
 def archive_list(request, wishlist_uuid):
-    wishlist = Wishlist.objects.get(uuid=wishlist_uuid)
-    if not request.user.is_authenticated:
-        return redirect("/accounts/login/")
-    if request.user == wishlist.owner:
-        if not wishlist.archived:
-            wishlist.archived = True
-            wishlist.save()
-        return redirect("view_my_lists")
+    wishlist = get_object_or_404(Wishlist, uuid=wishlist_uuid)
+    if wishlist.owner != request.user:
+        raise PermissionDenied
+    if not wishlist.archived:
+        wishlist.archived = True
+        wishlist.save()
     return redirect("view_my_lists")
 
 
@@ -65,9 +62,7 @@ def view_users_lists(request, user_id):
 @login_required
 @require_safe
 def view_users(request):
-    users = User.objects.filter(
-        is_active=True, is_superuser=False, is_staff=False
-    ).all()
+    users = User.objects.filter(is_active=True, is_superuser=False, is_staff=False).all()
     wishlists = Wishlist.objects.all()
     return render(
         request,
@@ -78,8 +73,8 @@ def view_users(request):
 
 @require_safe
 def view_list_item(request, item_uuid):
-    item = Item.objects.get(uuid=item_uuid)
-    wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
+    item = get_object_or_404(Item, uuid=item_uuid)
+    wishlist = item.wishlist
     return render(
         request,
         "item_view.html",
@@ -90,12 +85,16 @@ def view_list_item(request, item_uuid):
 @login_required
 def edit_list_item(request, item_uuid):
     item = get_object_or_404(Item, uuid=item_uuid)
-    wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
-    item_form = ItemForm(instance=item)
-    if request.POST:
+    wishlist = item.wishlist
+    if wishlist.owner != request.user:
+        raise PermissionDenied
+    if request.method == "POST":
+        item_form = ItemForm(data=request.POST, instance=item)
         if item_form.is_valid():
-            item_form.save(request.POST)
+            item_form.save(for_list=wishlist, as_user=request.user)
             return redirect(item)
+    else:
+        item_form = ItemForm(instance=item)
     return render(
         request,
         "edit_item_view.html",
@@ -111,23 +110,22 @@ def edit_list_item(request, item_uuid):
 @login_required
 @require_POST
 def save_list_item(request, item_uuid):
-    item = Item.objects.get(uuid=item_uuid)
-    wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
-    if request.user == wishlist.owner:
-        form = ItemForm(data=request.POST, instance=item)
-        if form.is_valid():
-            form.save(for_list=wishlist, as_user=request.user)
-        else:
-            return redirect(item)
+    item = get_object_or_404(Item, uuid=item_uuid)
+    wishlist = item.wishlist
+    if wishlist.owner != request.user:
+        raise PermissionDenied
+    form = ItemForm(data=request.POST, instance=item)
+    if form.is_valid():
+        form.save(for_list=wishlist, as_user=request.user)
     return redirect(item)
 
 
 @login_required
 @require_POST
 def buy_list_item(request, item_uuid):
-    item = Item.objects.get(uuid=item_uuid)
-    wishlist = Wishlist.objects.filter(item__uuid=item_uuid).first()
-    if not item.gifter and not request.user == wishlist.owner:
+    item = get_object_or_404(Item, uuid=item_uuid)
+    wishlist = item.wishlist
+    if not item.gifter and request.user != wishlist.owner:
         item.gifter = request.user
         item.save()
         return redirect(item)
@@ -138,14 +136,15 @@ def buy_list_item(request, item_uuid):
 @login_required
 @require_POST
 def return_list_item(request, item_uuid):
-    item = Item.objects.get(uuid=item_uuid)
-    if item.gifter == request.user:
-        item.gifter = None
-        item.archived = False
-        item.ordered = False
-        item.delivered = False
-        item.wrapped = False
-        item.save()
+    item = get_object_or_404(Item, uuid=item_uuid)
+    if item.gifter != request.user:
+        raise PermissionDenied
+    item.gifter = None
+    item.archived = False
+    item.ordered = False
+    item.delivered = False
+    item.wrapped = False
+    item.save()
     return redirect(item)
 
 
@@ -184,11 +183,7 @@ def archive_bought_items(request):
 
 @login_required
 def view_all_bought_items(request):
-    item_qs = (
-        Item.objects.filter(gifter=request.user, archived=False)
-        .order_by("wishlist")
-        .all()
-    )
+    item_qs = Item.objects.filter(gifter=request.user, archived=False).order_by("wishlist").all()
 
     BoughtItemFormSet = modelformset_factory(
         Item,
@@ -212,22 +207,14 @@ def view_all_bought_items(request):
                 {"formset": formset, "login_form": LoginForm()},
             )
 
-    return render(
-        request, "bought_items.html", {"formset": formset, "login_form": LoginForm()}
-    )
+    return render(request, "bought_items.html", {"formset": formset, "login_form": LoginForm()})
 
 
 @login_required
 @require_safe
 def return_bought_items(request):
-    items = (
-        Item.objects.filter(gifter=request.user, archived=False)
-        .order_by("wishlist")
-        .all()
-    )
-    return render(
-        request, "return_bought_items.html", {"items": items, "login_form": LoginForm()}
-    )
+    items = Item.objects.filter(gifter=request.user, archived=False).order_by("wishlist").all()
+    return render(request, "return_bought_items.html", {"items": items, "login_form": LoginForm()})
 
 
 @login_required
@@ -253,14 +240,11 @@ def new_list(request):
 
 @login_required
 def edit_list(request, wishlist_uuid):
-    wishlist = Wishlist.objects.get(uuid=wishlist_uuid)
+    wishlist = get_object_or_404(Wishlist, uuid=wishlist_uuid)
+    if wishlist.owner != request.user:
+        raise PermissionDenied
     form = ItemForm()
-
-    if not request.user.is_authenticated:
-        return redirect("/accounts/login/")
-    if not wishlist.owner == request.user:
-        return redirect("/accounts/login/")
-    if request.POST:
+    if request.method == "POST":
         form = ItemForm(data=request.POST)
         if form.is_valid():
             form.save(for_list=wishlist, as_user=request.user)
@@ -275,7 +259,9 @@ def edit_list(request, wishlist_uuid):
 @login_required
 @require_POST
 def create_list_item(request, wishlist_uuid):
-    wishlist = Wishlist.objects.get(uuid=wishlist_uuid)
+    wishlist = get_object_or_404(Wishlist, uuid=wishlist_uuid)
+    if wishlist.owner != request.user:
+        raise PermissionDenied
     form = ItemForm(data=request.POST)
 
     if form.is_valid():
@@ -286,4 +272,5 @@ def create_list_item(request, wishlist_uuid):
         request,
         "edit_wishlist.html",
         {"wishlist": wishlist, "form": form, "login_form": LoginForm()},
+        status=400,
     )

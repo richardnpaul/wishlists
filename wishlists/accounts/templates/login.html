@@ -4,7 +4,7 @@
 
 {% block header_text %}Enter your login details{% endblock %}
 
-{% block form %}
+{% block main %}
                         <form action="{% url 'account_login' %}" method="post">
                             <div class="form-group">
                                 {% csrf_token %}

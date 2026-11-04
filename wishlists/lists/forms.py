@@ -16,13 +16,11 @@ class WishListForm(forms.ModelForm):
             "title": forms.TextInput(
                 attrs={
                     "placeholder": "Enter a title for your wishlist here",
-                    "class": "form-control imput-lg",
+                    "class": "form-control input-lg",
                 }
             )
         }
-        error_messages = {
-            "title": {"required": "You can't have an empty wishlist title"}
-        }
+        error_messages = {"title": {"required": "You can't have an empty wishlist title"}}
 
     def save(self, as_user):
         self.instance.owner = as_user
@@ -40,12 +38,14 @@ class ItemForm(forms.ModelForm):
             }
         ),
     )
-    price = forms.DecimalField(
-        required=False, widget=forms.NumberInput(attrs={"class": "form-control"})
+    price = forms.DecimalField(required=False, widget=forms.NumberInput(attrs={"class": "form-control"}))
+    priority = forms.ChoiceField(
+        choices=Item.PRIORITY_CHOICES,
+        initial="3",
+        required=False,
+        widget=forms.Select(attrs={"class": "form-check-input"}),
     )
-    notes = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "form-control"}))
 
     class Meta:
         model = Item
@@ -57,14 +57,13 @@ class ItemForm(forms.ModelForm):
                     "class": "form-control",
                 }
             ),
-            "priority": forms.Select(attrs={"class": "form-check-input"}),
         }
         error_messages = {
             "text": {"required": EMPTY_ITEM_ERROR},
-            "priority": {
-                "required": "A priority must be submitted. Defaults to medium"
-            },
         }
+
+    def clean_priority(self):
+        return self.cleaned_data.get("priority") or "3"
 
     def save(self, for_list, as_user):
         self.instance.wishlist = for_list
@@ -76,9 +75,7 @@ class ItemForm(forms.ModelForm):
 class ArchiveItemForm(forms.ModelForm):
     archived = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"}),
     )
 
     class Meta:
@@ -116,21 +113,15 @@ class BoughtItemForm(forms.ModelForm):
 
     ordered = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"}),
     )
     delivered = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"}),
     )
     wrapped = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-control-sm form-check-input m-0"}
-        ),
+        widget=forms.CheckboxInput(attrs={"class": "form-control-sm form-check-input m-0"}),
     )
 
     class Meta:

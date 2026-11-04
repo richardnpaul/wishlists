@@ -1,4 +1,5 @@
 # Django Imports
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -7,18 +8,17 @@ from ..models import Item, Wishlist
 
 
 class ListAndItemModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="modeluser", password="password")
+
     def test_saving_and_retrieving_items(self):
-        wishlist = Wishlist()
+        wishlist = Wishlist(owner=self.user, title="My Wishlist")
         wishlist.save()
 
-        first_item = Item()
-        first_item.text = "The first ever item"
-        first_item.wishlist = wishlist
+        first_item = Item(text="The first ever item", wishlist=wishlist)
         first_item.save()
 
-        second_item = Item()
-        second_item.text = "The second item"
-        second_item.wishlist = wishlist
+        second_item = Item(text="The second item", wishlist=wishlist)
         second_item.save()
 
         saved_wishlist = Wishlist.objects.first()
@@ -35,12 +35,12 @@ class ListAndItemModelTest(TestCase):
         self.assertEqual(second_saved_item.wishlist, wishlist)
 
     def test_cannot_save_empty_list_items(self):
-        wishlist = Wishlist.objects.create()
+        wishlist = Wishlist.objects.create(owner=self.user, title="My Wishlist")
         item = Item(wishlist=wishlist, text="")
         with self.assertRaises(ValidationError):
             item.save()
             item.full_clean()
 
     def test_get_absolute_url(self):
-        wishlist = Wishlist.objects.create()
+        wishlist = Wishlist.objects.create(owner=self.user, title="My Wishlist")
         self.assertEqual(wishlist.get_absolute_url(), f"/wishlists/{wishlist.uuid}/")
