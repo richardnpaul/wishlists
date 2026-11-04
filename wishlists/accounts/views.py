@@ -1,4 +1,5 @@
 # Django Imports
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
@@ -39,6 +40,11 @@ def account_login(request):
                         user,
                         backend="django.contrib.auth.backends.ModelBackend",
                     )
+                    remember_me = login_form.cleaned_data.get("remember_me", False)
+                    if remember_me:
+                        request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+                    else:
+                        request.session.set_expiry(0)
                     return HttpResponseRedirect(next_url)
     else:
         login_form = LoginForm()

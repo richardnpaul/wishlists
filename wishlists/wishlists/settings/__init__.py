@@ -148,3 +148,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False").lower() in ("true", "1")
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "False").lower() in ("true", "1")
 CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "False").lower() in ("true", "1")
+
+# Session settings
+SESSION_COOKIE_AGE = int(os.environ.get("SESSION_COOKIE_AGE", 1209600))
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
