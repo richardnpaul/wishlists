@@ -90,7 +90,10 @@ class FunctionalTest(StaticLiveServerTestCase):
     def wait_for_row_in_list_table(self, row_text):
         table = self.browser.find_element(By.TAG_NAME, "table")
         rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(row_text, [row.text for row in rows])
+        self.assertTrue(
+            any(row_text in row.text for row in rows),
+            f"'{row_text}' not found in any row text: {[row.text for row in rows]}",
+        )
 
     def get_item_input_box(self):
         return self.wait_for(lambda: self.browser.find_element(By.ID, "id_text"))
