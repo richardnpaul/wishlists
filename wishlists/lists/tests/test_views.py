@@ -59,6 +59,7 @@ class ListViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="listviewuser", password="password")
         self.other_user = User.objects.create_user(username="otheruser", password="password")
+        self.client.force_login(self.user)
 
     def test_displays_only_items_for_that_list(self):
         correct_wishlist = Wishlist.objects.create(owner=self.user, title="Correct List")

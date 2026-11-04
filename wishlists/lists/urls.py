@@ -1,11 +1,12 @@
 # Django Imports
-from django.urls import path
+from django.urls import include, path
 
 from . import views
 
 
 urlpatterns = [
     path("new/", views.new_list, name="new_list"),
+    path("groups/", include("lists.group_urls")),
     # Wishlist Lists
     path("lists/", views.view_my_lists, name="view_my_lists"),
     path("lists/<int:user_id>/", views.view_users_lists, name="view_users_lists"),
@@ -15,6 +16,8 @@ urlpatterns = [
     path("<uuid:wishlist_uuid>/", views.view_list, name="view_list"),
     path("<uuid:wishlist_uuid>/archive/", views.archive_list, name="archive_list"),
     path("<uuid:wishlist_uuid>/edit/", views.edit_list, name="edit_list"),
+    path("<uuid:wishlist_uuid>/privacy/", views.edit_wishlist_privacy, name="edit_wishlist_privacy"),
+    path("<uuid:wishlist_uuid>/share/", views.edit_wishlist_privacy, name="share_list"),
     path(
         "<uuid:wishlist_uuid>/item/create/",
         views.create_list_item,
@@ -29,5 +32,4 @@ urlpatterns = [
     path("items/return/", views.return_bought_items, name="return_bought_items"),
     path("items/archive/", views.archive_bought_items, name="archive_bought_items"),
     path("items/", views.view_all_bought_items, name="bought_items"),
-    # path('<uuid:wishlist_uuid>/share/', views.share_list, name='share_list'),
 ]

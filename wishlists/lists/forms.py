@@ -2,7 +2,7 @@
 from django import forms
 
 # Local
-from .models import Item, Wishlist
+from .models import Group, Item, Wishlist
 
 
 EMPTY_ITEM_ERROR = "You can't have an empty wishlist item"
@@ -24,7 +24,64 @@ class WishListForm(forms.ModelForm):
 
     def save(self, as_user):
         self.instance.owner = as_user
+        if "is_private" in self.data:
+            val = self.data.get("is_private")
+            self.instance.is_private = val in (True, "true", "True", "on", "1", 1)
+        else:
+            self.instance.is_private = True
         return super().save()
+
+
+class GroupForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=128,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Enter a group name here",
+                "class": "form-control input-lg",
+            }
+        ),
+        error_messages={"required": "Group name is required"},
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "placeholder": "Enter group description (optional)",
+                "class": "form-control",
+                "rows": 3,
+            }
+        ),
+    )
+
+    class Meta:
+        model = Group
+        fields = ("name", "description")
+
+
+class WishlistPrivacyForm(forms.ModelForm):
+    is_private = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input", "id": "id_is_private"}),
+        label="Private Wishlist",
+        help_text="Private wishlists are visible only to you and members of groups you share with.",
+    )
+    groups = forms.ModelMultipleChoiceField(
+        queryset=Group.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
+        label="Expose to Groups",
+        help_text="Select which groups can view this wishlist.",
+    )
+
+    class Meta:
+        model = Wishlist
+        fields = ("is_private", "groups")
+
+    def __init__(self, *args, **kwargs):
+        kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        self.fields["groups"].queryset = Group.objects.all().order_by("name")
 
 
 class ItemForm(forms.ModelForm):

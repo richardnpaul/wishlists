@@ -1,0 +1,65 @@
+{% extends 'lists.base.html' %}
+
+{% block title %}
+<title>{{ group.name }} - Groups</title>
+{% endblock %}
+
+{% block header_text %}{{ group.name }}{% endblock %}
+
+{% block main %}
+<div class="container text-left mb-4">
+    <p class="lead">{{ group.description|default:"No description available." }}</p>
+    <p class="text-muted">
+        Created by: <strong>{{ group.creator.username }}</strong> |
+        Total Members: <strong>{{ group.members.count }}</strong>
+    </p>
+
+    <div class="mb-3">
+        {% if is_member %}
+        <span class="badge badge-success p-2">Member</span>
+        <form method="POST" action="{% url 'group_unsubscribe' group.uuid %}" class="d-inline ml-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Leave Group</button>
+        </form>
+        {% else %}
+        <form method="POST" action="{% url 'group_subscribe' group.uuid %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-sm">Join Group</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'group_list' %}" class="btn btn-secondary btn-sm ml-2">◄ Back to Groups</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block table %}
+<div class="container text-left">
+    <h3 class="mb-3">Wishlists Shared with this Group</h3>
+    {% if shared_wishlists %}
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col" class="col-6">Wishlist Title</th>
+                <th scope="col" class="col-3">Owner</th>
+                <th scope="col" class="col-3 text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for wishlist in shared_wishlists %}
+            <tr>
+                <td>
+                    <a href="{% url 'view_list' wishlist.uuid %}">{{ wishlist.title }}</a>
+                </td>
+                <td>{{ wishlist.owner.username }}</td>
+                <td class="text-center">
+                    <a href="{% url 'view_list' wishlist.uuid %}" class="btn btn-primary btn-sm">View Wishlist</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">No wishlists currently shared with this group.</p>
+    {% endif %}
+</div>
+{% endblock %}

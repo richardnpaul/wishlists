@@ -1,0 +1,37 @@
+{% extends 'lists.base.html' %}
+
+{% block title %}
+<title>Create Group - Wishlists</title>
+{% endblock %}
+
+{% block header_text %}Create a New Group{% endblock %}
+
+{% block main %}
+<div class="container col-md-8 mx-auto text-left">
+    <form method="POST" action="{% url 'group_create' %}">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}">Group Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <div class="text-danger small">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="text-danger small">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Group</button>
+        <a href="{% url 'group_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}
