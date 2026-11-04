@@ -35,6 +35,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Local
+    "accounts",
     # Django
     "django.contrib.admin",
     "django.contrib.auth",
@@ -45,7 +47,6 @@ INSTALLED_APPS = [
     # 3rd party
     "social_django",
     # Local
-    "accounts",
     "functional_tests",
     "lists",
 ]

@@ -3,6 +3,7 @@ from django.test import TestCase
 
 # Local
 from ..forms import LoginForm
+from .test_password_reset import *
 
 
 class LoginViewTest(TestCase):
