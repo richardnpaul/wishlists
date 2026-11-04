@@ -48,7 +48,10 @@ class FunctionalTest(StaticLiveServerTestCase):
             self.browser.quit()
 
     def create_pre_authenticated_session(self, username="testuser@example.com", password="password"):
-        user = User.objects.create_user(username=username, email=username, password=password)
+        user, _ = User.objects.get_or_create(username=username, defaults={"email": username})
+        user.set_password(password)
+        user.save()
+
         session = SessionStore()
         session[SESSION_KEY] = str(user.pk)
         session[BACKEND_SESSION_KEY] = "django.contrib.auth.backends.ModelBackend"
@@ -61,10 +64,22 @@ class FunctionalTest(StaticLiveServerTestCase):
             {
                 "name": settings.SESSION_COOKIE_NAME,
                 "value": session.session_key,
-                "max_age": None,
                 "path": "/",
             }
         )
+        self.browser.get(self.live_server_url)
+
+        # Fall back to UI login if session cookie was not picked up
+        if not self.browser.find_elements(By.LINK_TEXT, "Logout"):
+            self.browser.get(self.live_server_url + "/accounts/login/")
+            email_field = self.browser.find_element(By.NAME, "email")
+            email_field.clear()
+            email_field.send_keys(username)
+            pwd_field = self.browser.find_element(By.NAME, "password")
+            pwd_field.clear()
+            pwd_field.send_keys(password)
+            self.browser.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+            self.wait_for(lambda: self.browser.find_element(By.LINK_TEXT, "Logout"))
         return user
 
     @wait
@@ -78,4 +93,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.assertIn(row_text, [row.text for row in rows])
 
     def get_item_input_box(self):
-        return self.browser.find_element(By.ID, "id_text")
+        return self.wait_for(lambda: self.browser.find_element(By.ID, "id_text"))
+
+    def get_title_input_box(self):
+        return self.wait_for(lambda: self.browser.find_element(By.ID, "id_title"))

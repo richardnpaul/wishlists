@@ -14,7 +14,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn("Welcome to the wishlists site", self.browser.title)
 
         # The visitor sees an input field on the home page to start a new wishlist
-        titlebox = self.browser.find_element(By.ID, "id_title")
+        titlebox = self.get_title_input_box()
         self.assertEqual("Enter a title for your wishlist here", titlebox.get_attribute("placeholder"))
         titlebox.send_keys("Christmas Wishlist")
         titlebox.send_keys(Keys.ENTER)
@@ -43,7 +43,7 @@ class NewVisitorTest(FunctionalTest):
         self.create_pre_authenticated_session(username="alice@example.com")
         self.browser.get(self.live_server_url)
 
-        titlebox = self.browser.find_element(By.ID, "id_title")
+        titlebox = self.get_title_input_box()
         titlebox.send_keys("Alice Wishlist")
         titlebox.send_keys(Keys.ENTER)
 
@@ -67,7 +67,7 @@ class NewVisitorTest(FunctionalTest):
         page_text = self.browser.find_element(By.TAG_NAME, "body").text
         self.assertNotIn("First list item", page_text)
 
-        titlebox = self.browser.find_element(By.ID, "id_title")
+        titlebox = self.get_title_input_box()
         titlebox.send_keys("Bob Wishlist")
         titlebox.send_keys(Keys.ENTER)
 

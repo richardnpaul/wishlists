@@ -1,7 +1,7 @@
 {% extends 'lists.base.html' %}
 
                         {% block main %}
-                        <form method="POST" action="{% block form_action %}{% endblock %}" novalidate>
+                        <form method="POST" action="{% block form_action %}{% endblock %}">
                             {{ form.non_field_errors }}
                             <div class="form-group row">
                                 {% if form.text.errors %}
