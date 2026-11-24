@@ -6,6 +6,7 @@ from .models import Group, Item, Wishlist
 
 
 EMPTY_ITEM_ERROR = "You can't have an empty wishlist item"
+DUPLICATE_WISHLIST_ERROR = "You already have a wishlist with this title"
 
 
 class WishListForm(forms.ModelForm):
@@ -21,6 +22,18 @@ class WishListForm(forms.ModelForm):
             )
         }
         error_messages = {"title": {"required": "You can't have an empty wishlist title"}}
+
+    def __init__(self, *args, owner=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.owner = owner
+
+    def clean_title(self):
+        # "owner" isn't a form field, so ModelForm skips the (owner, title)
+        # unique_together check and a duplicate would hit the DB constraint.
+        title = self.cleaned_data["title"]
+        if self.owner is not None and Wishlist.objects.filter(owner=self.owner, title=title).exists():
+            raise forms.ValidationError(DUPLICATE_WISHLIST_ERROR)
+        return title
 
     def save(self, as_user):
         self.instance.owner = as_user

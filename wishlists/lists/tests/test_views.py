@@ -34,6 +34,27 @@ class NewListTest(TestCase):
         new_wishlist = Wishlist.objects.first()
         self.assertRedirects(response, f"/wishlists/{new_wishlist.uuid}/edit/")
 
+    def test_title_with_surrounding_whitespace_redirects_to_new_list(self):
+        response = self.client.post("/wishlists/new/", data={"title": "  Christmas  "})
+        new_wishlist = Wishlist.objects.get()
+        self.assertEqual(new_wishlist.title, "Christmas")
+        self.assertRedirects(response, f"/wishlists/{new_wishlist.uuid}/edit/")
+
+    def test_duplicate_title_shows_error_instead_of_500(self):
+        self.client.post("/wishlists/new/", data={"title": "Christmas 2026 🎅"})
+        response = self.client.post("/wishlists/new/", data={"title": "Christmas 2026 🎅"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "new_list.html")
+        self.assertContains(response, "You already have a wishlist with this title")
+        self.assertEqual(Wishlist.objects.count(), 1)
+
+    def test_same_title_allowed_for_different_owners(self):
+        other = User.objects.create_user(username="other@example.com", email="other@example.com", password="pw")
+        Wishlist.objects.create(owner=other, title="Christmas")
+        response = self.client.post("/wishlists/new/", data={"title": "Christmas"})
+        self.assertEqual(Wishlist.objects.filter(title="Christmas").count(), 2)
+        self.assertEqual(response.status_code, 302)
+
     def test_for_invalid_input_renders_new_list_template(self):
         response = self.client.post("/wishlists/new/", data={"title": ""})
         self.assertEqual(response.status_code, 200)

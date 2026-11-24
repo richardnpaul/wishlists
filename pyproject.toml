@@ -27,9 +27,6 @@ production = [
     "uWSGI>=2.0.31",
 ]
 
-[tool.setuptools.packages.find]
-where = ["wishlists"]
-
 [tool.ruff]
 line-length = 120
 target-version = "py315"

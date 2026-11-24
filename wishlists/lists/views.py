@@ -232,16 +232,14 @@ def return_bought_items(request):
 @login_required
 def new_list(request):
     if request.POST:
-        form = WishListForm(data=request.POST)
-        if form.is_valid():
-            form.save(as_user=request.user)
-        else:
+        form = WishListForm(data=request.POST, owner=request.user)
+        if not form.is_valid():
             return render(
                 request,
                 "new_list.html",
                 {"wishlist_form": form, "login_form": LoginForm()},
             )
-        wishlist = Wishlist.objects.get(title=request.POST["title"], owner=request.user)
+        wishlist = form.save(as_user=request.user)
         return redirect(f"/wishlists/{wishlist.uuid}/edit/")
     return render(
         request,
