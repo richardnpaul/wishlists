@@ -13,6 +13,7 @@ class Group(models.Model):
     description = models.TextField(blank=True)
     creator = models.ForeignKey(User, related_name="created_groups", on_delete=models.CASCADE)
     members = models.ManyToManyField(User, related_name="subscribed_groups", blank=True)
+    invite_version = models.PositiveIntegerField(default=1)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
