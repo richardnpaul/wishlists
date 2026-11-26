@@ -7,6 +7,7 @@
 {% block main %}
                         <form action="{% url 'account_registration' %}" method="post">
                             {% csrf_token %}
+                            {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
 
                             <div class="form-group">
                                 {{ form.first_name }}

@@ -75,26 +75,30 @@ class GroupForm(forms.ModelForm):
 class WishlistPrivacyForm(forms.ModelForm):
     is_private = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input", "id": "id_is_private"}),
-        label="Private Wishlist",
-        help_text="Private wishlists are visible only to you and members of groups you share with.",
+        widget=forms.CheckboxInput(attrs={"class": "custom-control-input", "id": "id_is_private"}),
+        label="Private wishlist",
+        help_text=(
+            "When on, only you and members of the groups you pick below can see this list. "
+            "Turn it off to make the list public: anyone with the link can view it, even without signing in."
+        ),
     )
     groups = forms.ModelMultipleChoiceField(
-        queryset=Group.objects.all(),
+        queryset=Group.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
-        label="Expose to Groups",
-        help_text="Select which groups can view this wishlist.",
+        label="Share with groups",
+        help_text="Members of the selected groups can view this list. Only groups you belong to are shown.",
     )
 
     class Meta:
         model = Wishlist
         fields = ("is_private", "groups")
 
-    def __init__(self, *args, **kwargs):
-        kwargs.pop("user", None)
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["groups"].queryset = Group.objects.all().order_by("name")
+        # Only offer groups the owner belongs to; anything else posted is rejected as an invalid choice.
+        owner = user or self.instance.owner
+        self.fields["groups"].queryset = owner.subscribed_groups.order_by("name")
 
 
 class ItemForm(forms.ModelForm):

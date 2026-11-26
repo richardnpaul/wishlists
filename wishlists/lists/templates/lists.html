@@ -1,8 +1,9 @@
 {% extends 'lists.base.html' %}
 
-{% block header_text %}My wishlists{% endblock %}
+{% block header_text %}{% if list_owner %}{{ list_owner.first_name|default:list_owner.username }}'s wishlists{% else %}My wishlists{% endif %}{% endblock %}
 
 {% block main %}
+                        {% if wishlist_form %}
                         <form method="POST" action="{% url 'new_list' %}">
                             {{ wishlist_form.title }}
                             {% csrf_token %}
@@ -13,6 +14,7 @@
                             {% endif %}
                             <input class="btn btn-primary align-center mt-3" role="button" type="submit" value="Create Wishlist" />
                         </form>
+                        {% endif %}
 {% endblock %}
 
 {% block table %}
@@ -32,5 +34,27 @@
                         </tr>
                         {% endfor %}
                     </table>
+
+                    {% if shared_lists %}
+                    <h3 class="mt-4 text-left">Shared with me</h3>
+                    <table class="table" id="shared_lists">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Wishlist</th>
+                                <th scope="col">Owner</th>
+                                <th scope="col">Shared via</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        {% for wishlist in shared_lists %}
+                        <tr>
+                            <td>{{ wishlist.title }}</td>
+                            <td>{{ wishlist.owner.first_name|default:wishlist.owner.username }}</td>
+                            <td>{% for group in wishlist.my_groups %}<a href="{% url 'group_detail' group.uuid %}">{{ group.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                            <td><a href="{% url 'view_list' wishlist.uuid %}" class="btn btn-primary float-right" role="button">View</a></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
 
 {% endblock %}

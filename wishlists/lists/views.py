@@ -1,10 +1,13 @@
 # Django Imports
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch
 from django.forms.models import modelformset_factory
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST, require_safe
 
 # Third-party Imports
@@ -12,7 +15,7 @@ from accounts.forms import LoginForm
 
 # Local
 from .forms import ArchiveItemForm, BoughtItemForm, GroupForm, ItemForm, WishListForm, WishlistPrivacyForm
-from .models import Group, Item, Wishlist, can_view_wishlist
+from .models import Group, InvalidInvite, Item, Wishlist, can_view_wishlist
 
 
 @require_safe
@@ -47,35 +50,55 @@ def archive_list(request, wishlist_uuid):
 @login_required
 @require_safe
 def view_my_lists(request):
-    lists = Wishlist.objects.filter(owner=request.user).all()
+    lists = Wishlist.objects.filter(owner=request.user)
+    # Lists shared with me through my groups (public lists elsewhere aren't "shared with me").
+    shared_lists = (
+        Wishlist.objects.filter(archived=False, groups__members=request.user)
+        .exclude(owner=request.user)
+        .select_related("owner")
+        .prefetch_related(Prefetch("groups", queryset=request.user.subscribed_groups.all(), to_attr="my_groups"))
+        .order_by("owner__first_name", "title")
+        .distinct()
+    )
     return render(
         request,
         "lists.html",
-        {"lists": lists, "wishlist_form": WishListForm(), "login_form": LoginForm()},
+        {
+            "lists": lists,
+            "shared_lists": shared_lists,
+            "wishlist_form": WishListForm(),
+            "login_form": LoginForm(),
+        },
     )
 
 
 @login_required
 @require_safe
 def view_users_lists(request, user_id):
-    all_lists = Wishlist.objects.filter(owner=user_id, archived=False).all()
-    lists = [w for w in all_lists if can_view_wishlist(request.user, w)]
+    list_owner = get_object_or_404(User, pk=user_id)
+    lists = Wishlist.objects.visible_to(request.user).filter(owner=list_owner, archived=False)
     return render(
         request,
         "lists.html",
-        {"lists": lists, "wishlist_form": WishListForm(), "login_form": LoginForm()},
+        {"lists": lists, "list_owner": list_owner, "login_form": LoginForm()},
     )
 
 
 @login_required
 @require_safe
 def view_users(request):
-    users = User.objects.filter(is_active=True, is_superuser=False, is_staff=False).all()
-    wishlists = Wishlist.objects.all()
+    # Only people with at least one list the viewer can see, so the page doesn't reveal who has an account.
+    visible_lists = Wishlist.objects.visible_to(request.user).filter(archived=False)
+    users = (
+        User.objects.filter(is_active=True, is_superuser=False, is_staff=False, wishlist_owner__in=visible_lists)
+        .exclude(pk=request.user.pk)
+        .distinct()
+        .order_by("first_name", "last_name")
+    )
     return render(
         request,
         "view_users.html",
-        {"users": users, "wishlists": wishlists, "login_form": LoginForm()},
+        {"users": users, "login_form": LoginForm()},
     )
 
 
@@ -286,23 +309,29 @@ def create_list_item(request, wishlist_uuid):
     )
 
 
+def _group_for_member(request, group_uuid):
+    """Return the group, or 403 if the current user isn't a member. Groups are invite-only."""
+    group = get_object_or_404(Group, uuid=group_uuid)
+    if not group.is_member(request.user):
+        raise PermissionDenied
+    return group
+
+
+def _group_for_creator(request, group_uuid):
+    group = get_object_or_404(Group, uuid=group_uuid)
+    if not group.is_creator(request.user):
+        raise PermissionDenied
+    return group
+
+
 @login_required
 @require_safe
 def group_list(request):
-    query = request.GET.get("q", "").strip()
-    groups_qs = Group.objects.annotate(member_count=Count("members")).order_by("name")
-    if query:
-        groups_qs = groups_qs.filter(Q(name__icontains=query) | Q(description__icontains=query))
-    user_group_ids = set(request.user.subscribed_groups.values_list("id", flat=True))
+    groups = request.user.subscribed_groups.annotate(member_count=Count("members")).order_by("name")
     return render(
         request,
         "group_list.html",
-        {
-            "groups": groups_qs,
-            "query": query,
-            "user_group_ids": user_group_ids,
-            "login_form": LoginForm(),
-        },
+        {"groups": groups, "login_form": LoginForm()},
     )
 
 
@@ -332,44 +361,92 @@ def group_create(request):
 @login_required
 @require_safe
 def group_detail(request, group_uuid):
-    group = get_object_or_404(Group, uuid=group_uuid)
-    is_member = group.members.filter(id=request.user.id).exists()
-    all_shared = group.wishlists.filter(archived=False).all()
-    shared_wishlists = [w for w in all_shared if can_view_wishlist(request.user, w)]
-    user_wishlists = Wishlist.objects.filter(owner=request.user, archived=False).all()
+    group = _group_for_member(request, group_uuid)
+    is_creator = group.is_creator(request.user)
+    context = {
+        "group": group,
+        "is_creator": is_creator,
+        "members": group.members.order_by("first_name", "last_name", "username"),
+        "shared_wishlists": group.wishlists.filter(archived=False).select_related("owner").order_by("title"),
+        "login_form": LoginForm(),
+    }
+    if is_creator:
+        context["invite_url"] = request.build_absolute_uri(reverse("group_join", args=[group.make_invite_token()]))
+        context["invite_max_age_days"] = settings.GROUP_INVITE_MAX_AGE // (60 * 60 * 24)
+        context["edit_form"] = GroupForm(instance=group)
+    return render(request, "group_detail.html", context)
+
+
+@login_required
+def group_join(request, token):
+    try:
+        group = Group.from_invite_token(token)
+    except InvalidInvite:
+        return render(request, "group_join.html", {"invalid": True, "login_form": LoginForm()}, status=404)
+    if group.is_member(request.user):
+        return redirect("group_detail", group_uuid=group.uuid)
+    if request.method == "POST":
+        group.members.add(request.user)
+        return redirect("group_detail", group_uuid=group.uuid)
     return render(
         request,
-        "group_detail.html",
-        {
-            "group": group,
-            "is_member": is_member,
-            "shared_wishlists": shared_wishlists,
-            "user_wishlists": user_wishlists,
-            "login_form": LoginForm(),
-        },
+        "group_join.html",
+        {"group": group, "token": token, "login_form": LoginForm()},
     )
 
 
 @login_required
 @require_POST
-def group_subscribe(request, group_uuid):
-    group = get_object_or_404(Group, uuid=group_uuid)
-    group.members.add(request.user)
-    next_url = request.POST.get("next")
-    if next_url and next_url.startswith("/"):
-        return redirect(next_url)
+def group_leave(request, group_uuid):
+    group = _group_for_member(request, group_uuid)
+    if group.is_creator(request.user):
+        # A group must keep its creator; they delete it instead.
+        return HttpResponseBadRequest("The group creator can't leave the group; delete it instead.")
+    group.remove_member(request.user)
+    return redirect("group_list")
+
+
+@login_required
+@require_POST
+def group_remove_member(request, group_uuid, user_id):
+    group = _group_for_creator(request, group_uuid)
+    member = get_object_or_404(group.members, pk=user_id)
+    if member == group.creator:
+        return HttpResponseBadRequest("The group creator can't be removed.")
+    group.remove_member(member)
     return redirect("group_detail", group_uuid=group.uuid)
 
 
 @login_required
 @require_POST
-def group_unsubscribe(request, group_uuid):
-    group = get_object_or_404(Group, uuid=group_uuid)
-    group.members.remove(request.user)
-    next_url = request.POST.get("next")
-    if next_url and next_url.startswith("/"):
-        return redirect(next_url)
+def group_reset_invite(request, group_uuid):
+    group = _group_for_creator(request, group_uuid)
+    group.reset_invite()
     return redirect("group_detail", group_uuid=group.uuid)
+
+
+@login_required
+@require_POST
+def group_edit(request, group_uuid):
+    group = _group_for_creator(request, group_uuid)
+    form = GroupForm(data=request.POST, instance=group)
+    if form.is_valid():
+        form.save()
+        return redirect("group_detail", group_uuid=group.uuid)
+    return render(
+        request,
+        "group_create.html",
+        {"form": form, "group": group, "login_form": LoginForm()},
+        status=400,
+    )
+
+
+@login_required
+@require_POST
+def group_delete(request, group_uuid):
+    group = _group_for_creator(request, group_uuid)
+    group.delete()
+    return redirect("group_list")
 
 
 @login_required

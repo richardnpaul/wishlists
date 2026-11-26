@@ -1,14 +1,14 @@
 {% extends 'lists.base.html' %}
 
 {% block title %}
-<title>Create Group - Wishlists</title>
+<title>{% if group %}Edit {{ group.name }}{% else %}Create Group{% endif %} - Wishlists</title>
 {% endblock %}
 
-{% block header_text %}Create a New Group{% endblock %}
+{% block header_text %}{% if group %}Edit Group{% else %}Create a New Group{% endif %}{% endblock %}
 
 {% block main %}
 <div class="container col-md-8 mx-auto text-left">
-    <form method="POST" action="{% url 'group_create' %}">
+    <form method="POST" action="{% if group %}{% url 'group_edit' group.uuid %}{% else %}{% url 'group_create' %}{% endif %}">
         {% csrf_token %}
         {% if form.non_field_errors %}
         <div class="alert alert-danger">{{ form.non_field_errors }}</div>
@@ -30,8 +30,8 @@
             {% endif %}
         </div>
 
-        <button type="submit" class="btn btn-primary">Create Group</button>
-        <a href="{% url 'group_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+        <button type="submit" class="btn btn-primary">{% if group %}Save Changes{% else %}Create Group{% endif %}</button>
+        <a href="{% if group %}{% url 'group_detail' group.uuid %}{% else %}{% url 'group_list' %}{% endif %}" class="btn btn-secondary ml-2">Cancel</a>
     </form>
 </div>
 {% endblock %}

@@ -1,15 +1,17 @@
 {% extends 'lists.base.html' %}
 
-{% block header_text %}My wishlists{% endblock %}
+{% block header_text %}People{% endblock %}
 
 {% block table %}
 
                     <table class="table">
-                        {% for user in users %}
+                        {% for person in users %}
                         <tr>
-                            <td>{{ user.first_name }} {{ user.last_name }}</td>
-                            <td><a href="{% url 'view_users_lists' user.id %}" class="btn btn-primary float-right" role="button">View Lists</a></td>
+                            <td>{{ person.first_name }} {{ person.last_name }}</td>
+                            <td><a href="{% url 'view_users_lists' person.id %}" class="btn btn-primary float-right" role="button">View Lists</a></td>
                         </tr>
+                        {% empty %}
+                        <tr><td class="text-muted">Nobody has shared a list with you yet. Lists shared with your groups, and public lists, show up here.</td></tr>
                         {% endfor %}
                     </table>
 

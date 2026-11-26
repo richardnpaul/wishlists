@@ -448,8 +448,8 @@ class WishlistAccessControlViewTest(TestCase):
 # ==============================================================================
 
 
-class GroupDiscoveryAndSubscriptionViewTest(TestCase):
-    """View tests for /groups/, /groups/create/, /groups/<uuid>/, subscribe and unsubscribe."""
+class GroupViewTest(TestCase):
+    """View tests for /groups/, /groups/create/, /groups/<uuid>/ and leaving a group."""
 
     def setUp(self):
         Group = _get_group_model()
@@ -534,23 +534,23 @@ class GroupDiscoveryAndSubscriptionViewTest(TestCase):
         self.assertContains(response, "Book Lovers")
         self.assertContains(response, self.user1.username)
 
-    def test_group_subscribe_post_adds_user_to_members(self):
-        """POST /groups/<uuid>/subscribe/ subscribes logged-in user to group."""
+    def test_group_detail_forbidden_for_non_member(self):
+        """Groups are invite-only: a non-member can't see the group page."""
         self.client.force_login(self.user2)
+        response = self.client.get(f"/groups/{self.group.uuid}/")
+        self.assertEqual(response.status_code, 403)
+
+    def test_member_can_leave_group(self):
+        """POST /groups/<uuid>/leave/ removes the logged-in member."""
+        self.group.members.add(self.user2)
+        self.client.force_login(self.user2)
+        response = self.client.post(f"/groups/{self.group.uuid}/leave/")
+        self.assertEqual(response.status_code, 302)
         self.assertFalse(self.group.members.filter(id=self.user2.id).exists())
 
-        response = self.client.post(f"/groups/{self.group.uuid}/subscribe/")
-        self.assertIn(response.status_code, [200, 302])
-        self.assertTrue(self.group.members.filter(id=self.user2.id).exists())
-
-    def test_group_unsubscribe_post_removes_user_from_members(self):
-        """POST /groups/<uuid>/unsubscribe/ removes logged-in user from group members."""
-        self.group.members.add(self.user2)
-        self.assertTrue(self.group.members.filter(id=self.user2.id).exists())
-
+    def test_old_subscribe_urls_are_gone(self):
         self.client.force_login(self.user2)
-        response = self.client.post(f"/groups/{self.group.uuid}/unsubscribe/")
-        self.assertIn(response.status_code, [200, 302])
+        self.assertEqual(self.client.post(f"/groups/{self.group.uuid}/subscribe/").status_code, 404)
         self.assertFalse(self.group.members.filter(id=self.user2.id).exists())
 
 

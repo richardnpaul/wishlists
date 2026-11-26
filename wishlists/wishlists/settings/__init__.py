@@ -130,6 +130,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 
+# Group invite links are signed and expire after this many seconds (7 days).
+GROUP_INVITE_MAX_AGE = 60 * 60 * 24 * 7
+
+
 # Outbound email settings
 
 # Console email backend for dev

@@ -11,10 +11,10 @@
     <h4>{{ wishlist.title }}</h4>
     <form method="POST" action="{% url 'edit_wishlist_privacy' wishlist.uuid %}">
         {% csrf_token %}
-        <div class="form-check my-3">
+        <div class="custom-control custom-switch my-3">
             {{ privacy_form.is_private }}
-            <label class="form-check-label font-weight-bold" for="id_is_private">
-                Private Wishlist
+            <label class="custom-control-label font-weight-bold" for="id_is_private">
+                {{ privacy_form.is_private.label }}
             </label>
             <small class="form-text text-muted">
                 {{ privacy_form.is_private.help_text }}
@@ -22,7 +22,7 @@
         </div>
 
         <div class="form-group my-3">
-            <label class="font-weight-bold">Expose to Groups</label>
+            <label class="font-weight-bold">{{ privacy_form.groups.label }}</label>
             <small class="form-text text-muted mb-2">
                 {{ privacy_form.groups.help_text }}
             </small>
@@ -34,10 +34,13 @@
                 </label>
             </div>
             {% empty %}
-            <p class="text-muted small">No groups available. <a href="{% url 'group_create' %}">Create a group first</a>.</p>
+            <p class="text-muted small">You're not in any groups yet. <a href="{% url 'group_create' %}">Create a group</a> and invite people to share this list with them.</p>
             {% endfor %}
         </div>
 
+        {% if privacy_form.groups.errors %}
+        <div class="alert alert-danger">{{ privacy_form.groups.errors }}</div>
+        {% endif %}
         <button type="submit" class="btn btn-primary">Save Privacy Settings</button>
         <a href="{% url 'edit_list' wishlist.uuid %}" class="btn btn-secondary ml-2">Back to Wishlist</a>
     </form>

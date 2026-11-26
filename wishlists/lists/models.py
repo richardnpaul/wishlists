@@ -2,9 +2,19 @@
 import uuid
 
 # Django Imports
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import signing
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
+
+
+INVITE_SALT = "lists.group-invite"
+
+
+class InvalidInvite(Exception):
+    """Raised for a tampered, expired, reset, or orphaned group invite token."""
 
 
 class Group(models.Model):
@@ -36,6 +46,43 @@ class Group(models.Model):
             return False
         return self.creator == user
 
+    # Invite links: a signed "<uuid>:<invite_version>" with a timestamp. Bumping
+    # invite_version (reset_invite) invalidates every link issued before it.
+
+    def make_invite_token(self):
+        return signing.TimestampSigner(salt=INVITE_SALT).sign(f"{self.uuid}:{self.invite_version}")
+
+    @classmethod
+    def from_invite_token(cls, token):
+        try:
+            value = signing.TimestampSigner(salt=INVITE_SALT).unsign(token, max_age=settings.GROUP_INVITE_MAX_AGE)
+            group_uuid, version = value.split(":")
+            group = cls.objects.get(uuid=group_uuid)
+        except signing.BadSignature, ValueError, cls.DoesNotExist:
+            # SignatureExpired is a subclass of BadSignature.
+            raise InvalidInvite from None
+        if str(group.invite_version) != version:
+            raise InvalidInvite
+        return group
+
+    def reset_invite(self):
+        self.invite_version += 1
+        self.save(update_fields=["invite_version", "modified"])
+
+    def remove_member(self, user):
+        """Remove a member and unshare their wishlists from this group."""
+        self.members.remove(user)
+        self.wishlists.remove(*self.wishlists.filter(owner=user))
+
+
+class WishlistQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        """Wishlists `user` may view. Must agree with Wishlist.can_view."""
+        visible = Q(is_private=False)
+        if user.is_authenticated:
+            visible |= Q(owner=user) | Q(groups__members=user)
+        return self.filter(visible).distinct()
+
 
 class Wishlist(models.Model):
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, db_index=True, max_length=32)
@@ -47,6 +94,8 @@ class Wishlist(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     archived = models.BooleanField(default=False)
+
+    objects = WishlistQuerySet.as_manager()
 
     class Meta:
         unique_together = ("owner", "title")

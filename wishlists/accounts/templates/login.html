@@ -8,6 +8,7 @@
                         <form action="{% url 'account_login' %}" method="post">
                             <div class="form-group">
                                 {% csrf_token %}
+                                {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
                                 <div class="form-row m-2">
                                     {{ login_form.email }}
                                 </div>
@@ -27,7 +28,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="col align-items-center">
-                                        <strong><a class="text-center" href="{% url 'account_registration' %}">Click here to register</a></strong>
+                                        <strong><a class="text-center" href="{% url 'account_registration' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Click here to register</a></strong>
                                         <!--<a class="dropdown-item" href="#">Click here to reset password</a> -->
                                     </div>
                                 </div>
@@ -38,12 +39,12 @@
 
 
                                             <li class="google list-inline-item w-25 h-25">
-                                                <a href="{% url 'social:begin' 'google' %}">
+                                                <a href="{% url 'social:begin' 'google' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
                                                     <img class="w-100 h-100" src="https://developers.google.com/identity/images/g-logo.png" alt="Sign in with Google" />
                                                 </a>
                                             </li>
                                             <li class="facebook list-inline-item w-25 h-25">
-                                                <a href="{% url 'social:begin' 'facebook' %}">
+                                                <a href="{% url 'social:begin' 'facebook' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
                                                     <img class="w-100 h-100" src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Sign in with Facebook" />
                                                 </a>
                                             </li>

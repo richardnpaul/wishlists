@@ -143,6 +143,7 @@ class WishlistPrivacyFormAdversarialTest(TestCase):
         self.g1 = Group.objects.create(name="Beta Group", creator=self.user)
         self.g2 = Group.objects.create(name="Alpha Group", creator=self.user)
         self.g3 = Group.objects.create(name="Gamma Group", creator=self.user)
+        self.user.subscribed_groups.add(self.g1, self.g2, self.g3)
 
     def test_privacy_form_groups_queryset_alphabetical_order(self):
         """Groups queryset must be ordered alphabetically by name."""
@@ -206,6 +207,7 @@ class WishlistPrivacyViewSecurityTest(TestCase):
         self.attacker = User.objects.create_user(username="attacker_sec", password="password123")
         self.wishlist = Wishlist.objects.create(owner=self.owner, title="Confidential List", is_private=True)
         self.group = Group.objects.create(name="Confidential Group", creator=self.owner)
+        self.group.members.add(self.owner)
 
     def test_anonymous_user_redirected_to_login(self):
         """Unauthenticated user accessing privacy edit page is redirected to login."""
@@ -256,129 +258,33 @@ class WishlistPrivacyViewSecurityTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class SearchAndDiscoveryBoundaryTest(TestCase):
-    """Adversarial stress-testing of group search and discovery boundaries."""
+class GroupUrlBoundaryTest(TestCase):
+    """Malformed and unknown group URLs."""
 
     def setUp(self):
         self.user = User.objects.create_user(username="search_user", password="password123")
         self.client.force_login(self.user)
-        self.g1 = Group.objects.create(
-            name="Django Architects",
-            description="Discussing Django and Python architecture",
-            creator=self.user,
-        )
-        self.g2 = Group.objects.create(
-            name="Frontend Wizards",
-            description="React, Vue, and CSS styling tricks",
-            creator=self.user,
-        )
-        self.g3 = Group.objects.create(
-            name="Rustaceans",
-            description="High performance systems programming",
-            creator=self.user,
-        )
-
-    def test_empty_search_query_returns_all_groups(self):
-        """Empty search query ?q= returns all groups."""
-        response = self.client.get(reverse("group_list") + "?q=")
-        self.assertEqual(response.status_code, 200)
-        groups = list(response.context["groups"])
-        self.assertEqual(len(groups), 3)
-
-    def test_whitespace_search_query_returns_all_groups(self):
-        """Whitespace query ?q=   is stripped and returns all groups."""
-        response = self.client.get(reverse("group_list") + "?q=   ")
-        self.assertEqual(response.status_code, 200)
-        groups = list(response.context["groups"])
-        self.assertEqual(len(groups), 3)
-
-    def test_case_insensitive_search_match_in_name(self):
-        """Search query matches group name case-insensitively."""
-        for query in ("django", "DJANGO", "dJaNgO", "architect"):
-            with self.subTest(query=query):
-                response = self.client.get(reverse("group_list") + f"?q={query}")
-                self.assertEqual(response.status_code, 200)
-                groups = list(response.context["groups"])
-                self.assertEqual(len(groups), 1)
-                self.assertEqual(groups[0].name, "Django Architects")
-
-    def test_case_insensitive_search_match_in_description(self):
-        """Search query matches group description case-insensitively."""
-        for query in ("python", "PYTHON", "PyThOn"):
-            with self.subTest(query=query):
-                response = self.client.get(reverse("group_list") + f"?q={query}")
-                self.assertEqual(response.status_code, 200)
-                groups = list(response.context["groups"])
-                self.assertEqual(len(groups), 1)
-                self.assertEqual(groups[0].name, "Django Architects")
-
-    def test_search_partial_substring_match(self):
-        """Partial substring match in name or description."""
-        response = self.client.get(reverse("group_list") + "?q=Wiz")
-        self.assertEqual(response.status_code, 200)
-        groups = list(response.context["groups"])
-        self.assertEqual(len(groups), 1)
-        self.assertEqual(groups[0].name, "Frontend Wizards")
-
-    def test_search_no_match_returns_empty_and_friendly_message(self):
-        """Query with no matches returns empty queryset and alert in template."""
-        response = self.client.get(reverse("group_list") + "?q=NonexistentGroupKeywordXYZ")
-        self.assertEqual(response.status_code, 200)
-        groups = list(response.context["groups"])
-        self.assertEqual(len(groups), 0)
-        self.assertContains(response, "No groups found.")
-
-    def test_search_special_characters_do_not_crash(self):
-        """Adversarial search queries with SQL/regex characters do not cause 500 errors."""
-        adversarial_queries = [
-            "%",
-            "_",
-            "'",
-            "'' OR 1=1 --",
-            '<script>alert("xss")</script>',
-            "\\",
-            "; DROP TABLE lists_group; --",
-            "$@#!^&*()",
-        ]
-        for query in adversarial_queries:
-            with self.subTest(query=query):
-                response = self.client.get(reverse("group_list"), {"q": query})
-                self.assertEqual(
-                    response.status_code,
-                    200,
-                    f"Query {query} resulted in status code {response.status_code}",
-                )
-
-    def test_search_unicode_characters(self):
-        """Unicode characters in search query execute cleanly."""
-        Group.objects.create(name="Équipe de Recherche", description="Recherche et développement", creator=self.user)
-        response = self.client.get(reverse("group_list"), {"q": "Équipe"})
-        self.assertEqual(response.status_code, 200)
-        groups = list(response.context["groups"])
-        self.assertEqual(len(groups), 1)
 
     def test_nonexistent_group_uuid_returns_404(self):
-        """Accessing nonexistent group UUID returns 404."""
-        nonexistent_uuid = uuid.uuid4()
-        response = self.client.get(reverse("group_detail", kwargs={"group_uuid": nonexistent_uuid}))
+        response = self.client.get(reverse("group_detail", kwargs={"group_uuid": uuid.uuid4()}))
         self.assertEqual(response.status_code, 404)
 
     def test_invalid_uuid_returns_404(self):
-        """Accessing malformed UUID path returns 404."""
         response = self.client.get("/groups/not-a-valid-uuid/")
         self.assertEqual(response.status_code, 404)
 
-    def test_subscribe_nonexistent_uuid_returns_404(self):
-        """Subscribing to nonexistent group UUID returns 404."""
-        nonexistent_uuid = uuid.uuid4()
-        response = self.client.post(reverse("group_subscribe", kwargs={"group_uuid": nonexistent_uuid}))
+    def test_leave_nonexistent_uuid_returns_404(self):
+        response = self.client.post(reverse("group_leave", kwargs={"group_uuid": uuid.uuid4()}))
         self.assertEqual(response.status_code, 404)
 
-    def test_unsubscribe_nonexistent_uuid_returns_404(self):
-        """Unsubscribing from nonexistent group UUID returns 404."""
-        nonexistent_uuid = uuid.uuid4()
-        response = self.client.post(reverse("group_unsubscribe", kwargs={"group_uuid": nonexistent_uuid}))
-        self.assertEqual(response.status_code, 404)
+    def test_search_query_is_ignored_and_only_own_groups_listed(self):
+        """There's no public directory any more: ?q= can't surface other people's groups."""
+        other = User.objects.create_user(username="someone_else", password="password123")
+        Group.objects.create(name="Django Architects", creator=other).members.add(other)
+        response = self.client.get(reverse("group_list") + "?q=django")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context["groups"]), [])
+        self.assertNotContains(response, "Django Architects")
 
 
 class TemplateAndUIVerificationTest(TestCase):
@@ -461,61 +367,55 @@ class TemplateAndUIVerificationTest(TestCase):
         )
         self.assertNotContains(response, reverse("edit_list", kwargs={"wishlist_uuid": self.public_list.uuid}))
 
-    def test_group_list_membership_badges_and_buttons(self):
-        """Group list renders 'Subscribed' and 'Unsubscribe' for members, and 'Subscribe' for non-members."""
-        # Owner is member of self.group
+    def test_group_list_shows_only_my_groups(self):
+        """Group list shows groups I'm in, and nothing to non-members."""
         self.client.force_login(self.owner)
         response = self.client.get(reverse("group_list"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<span class="badge badge-success mb-1">Subscribed</span>')
-        self.assertContains(response, "Unsubscribe")
+        self.assertContains(response, "UI Verification Group")
 
-        # Visitor is NOT a member
         self.client.force_login(self.visitor)
         response = self.client.get(reverse("group_list"))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, '<span class="badge badge-success mb-1">Subscribed</span>')
-        self.assertContains(response, "Subscribe")
+        self.assertNotContains(response, "UI Verification Group")
+        self.assertNotContains(response, "Subscribe")
 
     def test_group_detail_membership_badges_and_actions(self):
-        """Group detail renders 'Member' and 'Leave Group' for members, and 'Join Group' for non-members."""
-        # Member view
-        self.client.force_login(self.owner)
+        """Creator sees Delete (not Leave); a member sees Leave; a non-member is refused."""
         url = reverse("group_detail", kwargs={"group_uuid": self.group.uuid})
+
+        self.client.force_login(self.owner)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Member")
-        self.assertContains(response, "Leave Group")
+        self.assertContains(response, "Delete Group")
+        self.assertNotContains(response, "Leave Group")
 
-        # Non-member view
+        self.group.members.add(self.visitor)
         self.client.force_login(self.visitor)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Leave Group")
-        self.assertContains(response, "Join Group")
+        self.assertContains(response, "Leave Group")
+        self.assertNotContains(response, "Delete Group")
+        self.assertNotContains(response, "Join Group")
+
+        self.group.members.remove(self.visitor)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
 
     def test_group_detail_shared_wishlist_filtering(self):
-        """Group detail page only displays shared wishlists that the requesting user has permission to see."""
-        # Expose both private and public lists to the group
+        """Only members can see a group's page; members see every list shared with it."""
         self.private_list.groups.add(self.group)
         self.public_list.groups.add(self.group)
-
-        # Visitor is NOT in group yet: private_list is accessible via group? Only if visitor is in group!
-        # Since visitor is not in group, can_view_wishlist for private_list is False!
-        self.client.force_login(self.visitor)
         url = reverse("group_detail", kwargs={"group_uuid": self.group.uuid})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        # Public list is visible
-        self.assertContains(response, self.public_list.title)
-        # Private list should NOT be visible to visitor because visitor is not a member of the group!
-        self.assertNotContains(response, self.private_list.title)
 
-        # Once visitor joins the group:
+        self.client.force_login(self.visitor)
+        self.assertEqual(self.client.get(url).status_code, 403)
+
         self.group.members.add(self.visitor)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        # Now private list IS visible because visitor is a member of the exposed group
+        self.assertContains(response, self.public_list.title)
         self.assertContains(response, self.private_list.title)
 
     def test_xss_protection_in_group_rendering(self):
@@ -525,6 +425,7 @@ class TemplateAndUIVerificationTest(TestCase):
             description='<img src=x onerror="alert(1)">',
             creator=self.owner,
         )
+        xss_group.members.add(self.owner)
         self.client.force_login(self.owner)
 
         # In group list
@@ -560,31 +461,6 @@ class GroupViewsAndRedirectionAdversarialTest(TestCase):
         form = response.context["form"]
         self.assertFalse(form.is_valid())
         self.assertIn("name", form.errors)
-
-    def test_group_subscribe_idempotent(self):
-        """Subscribing to a group multiple times does not raise error and keeps user as member."""
-        url = reverse("group_subscribe", kwargs={"group_uuid": self.group.uuid})
-        response1 = self.client.post(url)
-        self.assertEqual(response1.status_code, 302)
-        self.assertTrue(self.group.members.filter(id=self.user.id).exists())
-
-        # Second subscribe
-        response2 = self.client.post(url)
-        self.assertEqual(response2.status_code, 302)
-        self.assertEqual(self.group.members.filter(id=self.user.id).count(), 1)
-
-    def test_group_unsubscribe_idempotent(self):
-        """Unsubscribing when not a member does not raise error."""
-        url = reverse("group_unsubscribe", kwargs={"group_uuid": self.group.uuid})
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
-        self.assertFalse(self.group.members.filter(id=self.user.id).exists())
-
-    def test_group_subscribe_next_url_valid_local_redirect(self):
-        """POST next param with local URL redirects to that local URL."""
-        url = reverse("group_subscribe", kwargs={"group_uuid": self.group.uuid})
-        response = self.client.post(url, data={"next": "/groups/"})
-        self.assertRedirects(response, "/groups/")
 
     def test_privacy_form_invalid_group_pk_rejected(self):
         """POSTing invalid/non-existent group PK fails form validation."""

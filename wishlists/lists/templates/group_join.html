@@ -1,0 +1,29 @@
+{% extends 'lists.base.html' %}
+
+{% block title %}
+<title>{% if invalid %}Invite link not valid{% else %}Join {{ group.name }}{% endif %} - Wishlists</title>
+{% endblock %}
+
+{% block header_text %}{% if invalid %}This invite link isn't valid{% else %}Join {{ group.name }}?{% endif %}{% endblock %}
+
+{% block main %}
+<div class="container col-md-8 mx-auto text-left">
+    {% if invalid %}
+    <p class="lead">The link may have expired, been reset by the group's creator, or been copied incorrectly.</p>
+    <p>Ask the person who sent it for a new invite link.</p>
+    <a href="{% url 'group_list' %}" class="btn btn-secondary">Go to my groups</a>
+    {% else %}
+    <p class="lead">{{ group.description|default:"" }}</p>
+    <p class="text-muted">
+        Created by <strong>{{ group.creator.first_name|default:group.creator.username }}</strong> ·
+        {{ group.members.count }} member{{ group.members.count|pluralize }}
+    </p>
+    <p>Members can see wishlists shared with this group, and lists you share with it.</p>
+    <form method="POST" action="{% url 'group_join' token %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Join group</button>
+        <a href="{% url 'group_list' %}" class="btn btn-secondary ml-2">Not now</a>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

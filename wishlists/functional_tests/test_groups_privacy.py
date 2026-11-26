@@ -42,64 +42,82 @@ class GroupsAndWishlistPrivacyFunctionalTest(FunctionalTest):
             password="charliepassword123!",
         )
 
-    def test_group_discovery_creation_and_subscription_flow(self):
-        """User journey: Alice creates a group; Bob discovers it and subscribes."""
-        # 1. Alice logs in
+    def body_text(self):
+        return self.browser.find_element(By.TAG_NAME, "body").text
+
+    def test_group_invite_link_join_and_shared_list_flow(self):
+        """User journey: Alice creates a group and a list, shares the list with the group and sends Bob
+        the invite link; Bob joins and finds the list under "Shared with me"."""
+        # 1. Alice logs in and creates a group from the Groups page.
         self.create_pre_authenticated_session(username="alice@example.com", password="alicepassword123!")
-
-        # 2. Alice clicks on the Groups navbar link
         self.browser.get(self.live_server_url)
-        groups_link = self.wait_for(lambda: self.browser.find_element(By.LINK_TEXT, "Groups"))
-        groups_link.click()
+        self.wait_for(lambda: self.browser.find_element(By.LINK_TEXT, "Groups")).click()
+        self.wait_for(lambda: self.browser.find_element(By.LINK_TEXT, "Create New Group")).click()
 
-        # Alice arrives at /groups/
-        self.wait_for(lambda: self.assertIn("/groups/", self.browser.current_url))
+        self.wait_for(lambda: self.browser.find_element(By.NAME, "name")).send_keys("Board Game Guild")
+        self.browser.find_element(By.NAME, "description").send_keys("Tabletop gaming and strategy board games.")
+        self.browser.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
 
-        # Alice clicks Create Group
-        create_btn = self.wait_for(
-            lambda: self.browser.find_element(
-                By.XPATH,
-                "//a[contains(@href, '/groups/create/') or contains(text(), 'Create Group')]",
-            )
-        )
-        create_btn.click()
+        # She lands on the group page, which shows her an invite link.
+        invite_input = self.wait_for(lambda: self.browser.find_element(By.ID, "invite_url"))
+        invite_url = invite_input.get_attribute("value")
+        self.assertIn("/groups/join/", invite_url)
 
-        # 3. Alice fills out the group creation form
-        name_input = self.wait_for(lambda: self.browser.find_element(By.NAME, "name"))
-        desc_input = self.browser.find_element(By.NAME, "description")
+        # 2. Alice creates a list (private by default) and shares it with the group.
+        self.browser.get(self.live_server_url)
+        titlebox = self.get_title_input_box()
+        titlebox.send_keys("Alice Gaming List")
+        titlebox.send_keys(Keys.ENTER)
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys("Catan")
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table("Catan")
 
-        name_input.send_keys("Board Game Guild")
-        desc_input.send_keys("Tabletop gaming and strategy board games.")
-        submit_btn = self.browser.find_element(By.CSS_SELECTOR, "button[type='submit'], input[type='submit']")
-        submit_btn.click()
+        wishlist = Wishlist.objects.get(title="Alice Gaming List", owner=self.alice)
+        self.assertTrue(wishlist.is_private)
+        self.browser.get(self.live_server_url + f"/wishlists/{wishlist.uuid}/privacy/")
+        self.wait_for(
+            lambda: self.browser.find_element(By.XPATH, "//label[normalize-space()='Board Game Guild']")
+        ).click()
+        self.browser.find_element(By.XPATH, "//button[contains(text(), 'Save Privacy Settings')]").click()
+        self.wait_for(lambda: self.assertTrue(wishlist.groups.filter(name="Board Game Guild").exists()))
 
-        # Alice sees the newly created group listed
-        self.wait_for(lambda: self.assertIn("Board Game Guild", self.browser.find_element(By.TAG_NAME, "body").text))
-
-        # 4. Bob logs in in a fresh browser session
+        # 3. Bob can't find the group on his own: the Groups page only lists his groups.
         self.browser.quit()
         self.browser = self.create_browser()
         self.create_pre_authenticated_session(username="bob@example.com", password="bobpassword123!")
-
-        # Bob visits /groups/
         self.browser.get(self.live_server_url + "/groups/")
-        self.wait_for(lambda: self.assertIn("Board Game Guild", self.browser.find_element(By.TAG_NAME, "body").text))
+        self.wait_for(lambda: self.assertIn("not in any groups", self.body_text()))
+        self.assertNotIn("Board Game Guild", self.body_text())
 
-        # Bob subscribes to the group
-        subscribe_btn = self.wait_for(
-            lambda: self.browser.find_element(
-                By.XPATH,
-                "//button[contains(text(), 'Subscribe')]"
-                " | //input[@value='Subscribe']"
-                " | //a[contains(@href, 'subscribe')]",
-            )
-        )
-        subscribe_btn.click()
+        # 4. Bob opens the invite link, sees a confirmation page, and joins.
+        self.browser.get(invite_url)
+        self.wait_for(lambda: self.assertIn("Join Board Game Guild?", self.body_text()))
+        self.browser.find_element(By.XPATH, "//button[contains(text(), 'Join group')]").click()
+        self.wait_for(lambda: self.assertIn("Leave Group", self.body_text()))
+        group = _get_group_model().objects.get(name="Board Game Guild")
+        self.assertTrue(group.members.filter(id=self.bob.id).exists())
 
-        # Bob's status reflects subscription
+        # 5. Alice's list now appears under "Shared with me" on Bob's My Lists page.
+        self.browser.get(self.live_server_url + "/wishlists/lists/")
+        self.wait_for(lambda: self.assertIn("Shared with me", self.body_text()))
+        shared = self.browser.find_element(By.ID, "shared_lists")
+        self.assertIn("Alice Gaming List", shared.text)
+        self.assertIn("Board Game Guild", shared.text)
+
+    def test_invite_link_survives_login(self):
+        """An anonymous visitor following an invite link logs in and lands on the join page."""
         Group = _get_group_model()
-        group = Group.objects.get(name="Board Game Guild")
-        self.wait_for(lambda: self.assertTrue(group.members.filter(id=self.bob.id).exists()))
+        group = Group.objects.create(creator=self.alice, name="Board Game Guild")
+        group.members.add(self.alice)
+        invite_url = self.live_server_url + f"/groups/join/{group.make_invite_token()}/"
+
+        self.browser.get(invite_url)
+        self.wait_for(lambda: self.assertIn("/accounts/login/", self.browser.current_url))
+        self.browser.find_element(By.NAME, "email").send_keys("bob@example.com")
+        self.browser.find_element(By.NAME, "password").send_keys("bobpassword123!")
+        self.browser.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+        self.wait_for(lambda: self.assertIn("Join Board Game Guild?", self.body_text()))
 
     def test_wishlist_privacy_default_and_group_exposure_access_flow(self):
         """User journey: Alice creates private wishlist.
