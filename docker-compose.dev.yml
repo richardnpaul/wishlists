@@ -10,6 +10,9 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
+    environment:
+      # Print outbound mail (e.g. activation links) to the container log instead of sending via AWS SES.
+      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
     depends_on:
       - db
 
@@ -21,3 +24,9 @@ services:
       - POSTGRES_PASSWORD=wishlists
     ports:
       - 5432:5432
+    volumes:
+      # Postgres 18+ images keep data in a version-specific subdirectory of this path.
+      - db-data:/var/lib/postgresql
+
+volumes:
+  db-data:

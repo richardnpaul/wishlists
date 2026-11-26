@@ -52,7 +52,8 @@ STATIC_ROOT = "/static/"
 # Console email backend for dev
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = "django_ses.SESBackend"
+# Overridable so the local docker-compose stack can print mail instead of needing AWS credentials.
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django_ses.SESBackend")
 
 # Gmail accounts require additional configuration to allow direct mail through
 DEFAULT_FROM_EMAIL = "webmaster@example.com"
