@@ -13,7 +13,7 @@ WORKDIR /app
 
 ENV PATH="/venv/bin:$PATH"
 
-COPY --chown=wishlists:wishlists pyproject.toml README.md /app/
+COPY --chown=wishlists:wishlists pyproject.toml /app/
 
 RUN pip install --no-cache-dir .
 
@@ -40,7 +40,7 @@ RUN wget -qO /usr/bin/uwsgitop https://raw.githubusercontent.com/xrmx/uwsgitop/r
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        libpq-dev postgresql-client \
+    libpq-dev postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home --shell /bin/bash --home-dir /home/wishlists wishlists
