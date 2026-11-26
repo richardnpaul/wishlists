@@ -23,7 +23,7 @@ DATABASES = {
 # Add all social logins before the contrib auth default
 AUTHENTICATION_BACKENDS = [
     "social_core.backends.google.GoogleOAuth2",
-    "social.backends.facebook.FacebookOAuth2",
+    "social_core.backends.facebook.FacebookOAuth2",
     "social_core.backends.twitter.TwitterOAuth",
     "django.contrib.auth.backends.ModelBackend",
 ]
